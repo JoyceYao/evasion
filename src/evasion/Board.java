@@ -15,9 +15,9 @@ public class Board {
 	public int M;//max walls
 	public int SQ_CAPTURE_DIST = 16;
 	
-	Hunter h;
-	Prey p;
-	List<Wall> walls;
+	public Hunter h;
+	public Prey p;
+	public List<Wall> walls;
 	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
