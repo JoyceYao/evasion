@@ -1,5 +1,6 @@
 # evasion
 jar cvfe evasionServer.jar  Server/ServerMain  *.class
+
 jar cvfe evasionClient.jar  evasion/Main  *.class
 
 Server:
