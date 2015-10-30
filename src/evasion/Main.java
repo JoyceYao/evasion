@@ -23,15 +23,17 @@ public class Main {
 	
 	final String host = "localhost";
 	int port = 1337; //Port
-	
+	final static int ARGS_LEN = 6;
 	//$java -jar evasion.jar -rH -sR -tmv_cly -p1337 -N3 -M10 
 	public static void main(String[] args) {
 	
 		Main m = new Main();
+		m.board = new Board();
 		m.tcpClient = new TCPClient();
-		BitSet bs = new BitSet(6);
 		
-		if (args.length != 3) {
+		BitSet bs = new BitSet(ARGS_LEN);
+		
+		if (args.length != ARGS_LEN) {
 			System.out.println("Not all initialization command line arguments were specified. Halting");
 			System.exit(-1);
 		}
@@ -73,15 +75,13 @@ public class Main {
 					break;
 			}
 		}
-		
-		if (bs.cardinality() != bs.size()) {
+		if (bs.cardinality() != ARGS_LEN) {
 			System.out.println("Not all initialization parameters supplied. Halting");
 			System.exit(-1);			
 		}
 		
 		try {
 			m.tcpClient.startTCP(m.host, m.port);
-			m.board = new Board();
 			m.run();
 			m.tcpClient.closeTCP();
 		} catch (UnknownHostException e) {

@@ -21,9 +21,11 @@ public class Board {
 	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
+		h = new Hunter();
+		p = new Prey();
+		walls = new ArrayList<Wall>();
 		h.hl.xloc = 0; h.hl.yloc = 0;
 		p.pl.xloc = 230; p.pl.yloc = 200;
-		walls = new ArrayList<Wall>();
 	}
 	public void addHunterMove(HunterMove hm) {
 		

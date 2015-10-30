@@ -3,5 +3,5 @@ package evasion.prey;
 import evasion.Location;
 
 public class Prey {
-	public Location pl;
+	public Location pl = new Location();
 }
