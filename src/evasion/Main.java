@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import evasion.hunter.HunterMove;
 import evasion.hunter.strategies.AbsHunterStrategy;
-import evasion.hunter.strategies.HSRandomV1;
 import evasion.prey.PreyMove;
 import evasion.prey.strategies.AbsPreyStrategy;
 
@@ -82,7 +81,11 @@ public class Main {
 		
 		try {
 			m.tcpClient.startTCP(m.host, m.port);
-			m.run();
+			if (m.role == PlayerRole.HUNTER) {
+				m.Hunt();
+			} else {
+				m.Evade();
+			}
 			m.tcpClient.closeTCP();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -94,27 +97,80 @@ public class Main {
 		
 	}
 	
-	private void run() throws IOException{
+	private void Hunt() throws IOException {
 		boolean playing = true;
-		
-		while(playing){
-			String input = tcpClient.read();
-//			String input = tcpClient.readBuffered();
-			System.out.println("Receive Input:" + input);
-			String[] line = input.split("\n");
-			int lastIdx = line.length-1;
-		
-			switch(line[lastIdx]){
-				case "TEAM": tcpClient.write(getTeamName()); break;
-			
-				case "MOVE": tcpClient.write(getNextMove(line)); break;
-				
-				case "END": playing = false; break;
-				
+		do {
+			for (int i = 0; i < 2; i++) {//Hunter moves twice
+				HunterMove hm = hstrategy.makeAMove(board);
+				board.addHunterMove(hm);
+				sendHunterMove(hm);
+				if (board.hunterCaughtPrey()) {
+					playing = false;
+				}
 			}
-		}
-	}	
+			PreyMove pm = getPreyMove();//Prey moves once
+			board.addPreyMove(pm);
+		} while (playing);
+	}
 	
+	private void Evade() throws IOException {
+		boolean playing = true;
+		do {
+			HunterMove hm = getHunterMove();//Hunter once
+			board.addHunterMove(hm);
+
+			PreyMove pm = pstrategy.makeAMove(board);
+			board.addPreyMove(pm);
+			sendPreyMove(pm);
+
+			hm = getHunterMove();//Hunter twice
+			board.addHunterMove(hm);			
+			if (board.hunterCaughtPrey()) {
+				playing = false;
+			}
+		} while (playing);
+		
+	}
+	
+	private PreyMove getPreyMove() {
+		//tcpClient read()
+		return null;
+	}
+
+	private void sendPreyMove(PreyMove pm) throws IOException {
+		tcpClient.write(pm.toString());//send the move
+	}
+	
+	private void sendHunterMove(HunterMove hm) throws IOException {
+		tcpClient.write(hm.toString());//send the move
+	}
+	
+	private HunterMove getHunterMove() {
+		//tcpClient.read() and convert to JSON
+		return null;
+	}
+	
+//	private void run() throws IOException{
+//		boolean playing = true;
+//
+//		while(playing){
+//			String input = tcpClient.read();
+////			String input = tcpClient.readBuffered();
+//			System.out.println("Receive Input:" + input);
+//			String[] line = input.split("\n");
+//			int lastIdx = line.length-1;
+//		
+//			switch(line[lastIdx]){
+//				case "TEAM": tcpClient.write(getTeamName()); break;
+//			
+//				case "MOVE": tcpClient.write(getNextMove(line)); break;
+//				
+//				case "END": playing = false; break;
+//				
+//			}
+//		}
+//	}	
+//	
 	
 	private String getTeamName(){
 		return teamName;

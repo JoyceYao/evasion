@@ -54,7 +54,7 @@ public class Board {
 		return false;
 	}
 	
-	public boolean didHunterCatchPrey() {
+	public boolean hunterCaughtPrey() {
 		double distsq = getDistanceSq(h.hl, p.pl);
 		if ( (distsq < SQ_CAPTURE_DIST) && !wallExistsBetween(h.hl, p.pl) ) {
 			return true;

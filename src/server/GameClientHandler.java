@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.json.JSONWriter;
+
 public class GameClientHandler implements Runnable {
 	Socket cSocket;
 	BufferedReader in;
@@ -37,7 +39,7 @@ public class GameClientHandler implements Runnable {
 	public void run() {
 		String line;
 		//ask for team name
-		out.println("TEAM");
+		//out.println("TEAM");
 		while (true) {
 			try {
 				line = in.readLine();
