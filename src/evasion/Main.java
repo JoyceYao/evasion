@@ -19,10 +19,13 @@ public class Main {
 	Board board;
 	AbsHunterStrategy hstrategy;
 	AbsPreyStrategy pstrategy;
+	int publisherPort = 1990;
+	MessagePublisher publisher = new MessagePublisher();
 	
 	final String host = "localhost";
-	int port = 1337; //Port
-	final static int ARGS_LEN = 6;
+	int port = 1991; //Hunter to Server Port
+	//int port = 1992; //Prey to Server Port
+	final static int ARGS_LEN = 7;
 	//$java -jar evasion.jar -rH -sR -tmv_cly -p1337 -N3 -M10 
 	public static void main(String[] args) {
 	
@@ -70,16 +73,21 @@ public class Main {
 					m.board.M = Integer.parseInt(args[i].substring(2));
 					bs.set(5);
 					break;
+				case "-U": //publisher port 1990 for published moves
+					m.publisherPort = Integer.parseInt(args[i].substring(2));
+					bs.set(6);
+					break;
 				default:
 					break;
 			}
 		}
 		if (bs.cardinality() != ARGS_LEN) {
 			System.out.println("Not all initialization parameters supplied. Halting");
-			System.exit(-1);			
+			System.exit(-1);
 		}
 		
 		try {
+			m.publisher.startTCP(m.host, m.publisherPort);
 			m.tcpClient.startTCP(m.host, m.port);
 			if (m.role == PlayerRole.HUNTER) {
 				m.Hunt();
@@ -116,6 +124,8 @@ public class Main {
 	private void Evade() throws IOException {
 		boolean playing = true;
 		do {
+			System.out.print("pos: " + publisher.getPositions());
+			System.out.println("walls: " + publisher.getWalls());
 			HunterMove hm = getHunterMove();//Hunter once
 			board.addHunterMove(hm);
 

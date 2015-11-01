@@ -7,8 +7,8 @@ import evasion.Move;
 import evasion.Wall;
 
 public class HunterMove extends Move {
-	Wall buildWall;
-	Wall teardownWall;
+	public Wall buildWall;
+	public Wall teardownWall;
 	
 	public String toString() {
 		JSONObject obj = new JSONObject();
