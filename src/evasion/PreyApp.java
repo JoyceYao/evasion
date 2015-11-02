@@ -1,6 +1,7 @@
 package evasion;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +16,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class App {
+import evasion.prey.PreyMove;
+
+public class PreyApp {
 	private static CountDownLatch messageLatch;
 	
 	private static String SENT_MESSAGE = "";
@@ -33,7 +36,7 @@ public class App {
 
             ClientManager client = ClientManager.createClient();
             
-            Endpoint publisher  = new Endpoint() {
+            Endpoint prey = new Endpoint() {
 
 				@Override
 				public void onOpen(Session session, EndpointConfig arg1) {
@@ -44,20 +47,22 @@ public class App {
                                 messageLatch.countDown();
                             }
                         });
-                        do {
-                        	Thread.sleep(5000);
-	                        SENT_MESSAGE = getPositionsCommand();
-	                        session.getBasicRemote().sendText(SENT_MESSAGE);
-	                        SENT_MESSAGE = getWallsCommand();
-	                        session.getBasicRemote().sendText(SENT_MESSAGE);
-                        } while(true);
-                    } catch (IOException | InterruptedException e) {
+                        for (;;) {
+                            session.getBasicRemote().sendText(makeARandomMove());
+                            SENT_MESSAGE = getPositionsCommand();
+                            session.getBasicRemote().sendText(SENT_MESSAGE);
+                            SENT_MESSAGE = getWallsCommand();
+                            session.getBasicRemote().sendText(SENT_MESSAGE);                        	
+                        	
+                        }
+                        
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
 					
 				}
             };
-            client.connectToServer(publisher, cec, new URI(publisherEndpoint));
+            client.connectToServer(prey, cec, new URI(preyEndpoint));
             messageLatch.await(100, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,5 +91,39 @@ public class App {
 		}
         return action;
     }
+    
+    public static String makeARandomMove() {
+    	String action = "";
+    	ObjectMapper mapper = new ObjectMapper();
+    	ObjectNode node = mapper.createObjectNode();
+        node.put("command", "M"); 
+        String dir = new String();
+        Random rand = new Random();
+		int randomNum = rand.nextInt(9); //
+		switch (randomNum) {
+			case 0: dir = "NE"; break;//NE
+			case 1: dir = "E"; break;//E
+			case 2: dir = "SE"; break;//SE
+			case 3: dir = "S"; break;//S
+			case 4: dir = "SW"; break;//SW
+			case 5: dir = "W"; break;//W
+			case 6: dir = "NW"; break;//NW
+			case 7: dir = "N"; break;//N
+			case 8: dir = "NE"; break;//no move
+			default: dir = "NE"; break;//NE
+		}
+		
+		node.put("direction", dir);
+		//System.out.println( "M," + dir);
+		
+        try {
+			action = mapper.writeValueAsString(node);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return action;
+    }
+    
 
 }

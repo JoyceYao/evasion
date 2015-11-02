@@ -7,7 +7,7 @@ import evasion.prey.PreyMove;
 
 public class PRRandomV1 extends AbsPreyStrategy{
 	Random rand = new Random();
-	int range = 8; //[0-9)
+	int range = 9; //[0-9)
 	@Override
 	public PreyMove makeAMove(Board bd) {
 		int randomNum = rand.nextInt(range); //NE, SE, SW, NW 
