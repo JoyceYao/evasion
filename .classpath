@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/javax.websocket-api-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-client-1.12.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-container-grizzly-client-1.12.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-server-1.12.jar"/>
+	<classpathentry kind="lib" path="D:/HPS_HW/org.json-20120521.jar"/>
+	<classpathentry kind="lib" path="D:/HPS_HW/tyrus-core-1.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

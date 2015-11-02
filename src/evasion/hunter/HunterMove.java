@@ -1,5 +1,6 @@
 package evasion.hunter;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import evasion.CardinalDirections;
@@ -12,17 +13,27 @@ public class HunterMove extends Move {
 	
 	public String toString() {
 		JSONObject obj = new JSONObject();
-		obj.put("Command", "M");
+		try {
+			obj.put("Command", "M");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
 		if (d == CardinalDirections.NOMOVE) {
 			
 		} else {
-			obj.put("direction", d);
+			try {
+				obj.put("direction", d);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return obj.toString();
 	}
 	
-	public String moveToString() {
+	public String moveToString() throws JSONException {
 		JSONObject obj = new JSONObject();
 		obj.put("Command", "M");
 		CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
@@ -34,7 +45,7 @@ public class HunterMove extends Move {
 		return obj.toString();
 	}
 
-	public String buildWallToString() {
+	public String buildWallToString() throws JSONException {
 		if (buildWall == null) {
 			return "";
 		}
@@ -57,7 +68,7 @@ public class HunterMove extends Move {
 		return obj.toString();
 	}
 	
-	public String tearDownWallToString() {
+	public String tearDownWallToString() throws JSONException {
 		if (teardownWall == null) {
 			return "";
 		}

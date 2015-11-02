@@ -19,6 +19,8 @@ public class ServerMain {
 		
 		BitSet bs = new BitSet(ARGS_LEN);
 		
+		System.out.println("bs.cardinality()=" + bs.cardinality());
+		
 		if (args.length < ARGS_LEN) {
 			System.out.println("Not all initialization command line arguments were specified. Halting");
 			System.exit(-1);

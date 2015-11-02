@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MessagePublisher {
@@ -56,14 +57,14 @@ public class MessagePublisher {
 		return readBuffered();
 	}
 
-	public String getPositions() throws IOException {
+	public String getPositions() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		JSONObject j = new JSONObject();
 		j.put("Command", "P");
 		return sendAndReceive(j.toString());
 	}
 	
-	public String getWalls() throws IOException {
+	public String getWalls() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		JSONObject j = new JSONObject();
 		j.put("Command", "W");
