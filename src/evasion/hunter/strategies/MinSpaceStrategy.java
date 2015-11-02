@@ -40,7 +40,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		// remove extra walls
 		for(int i=0; i<b.walls.size(); i++){
 			if(!innerWall.contains(b.walls.get(i).wallIndex)){
-				b.walls.remove(i);
+				//b.walls.remove(i);
+				hm.teardownWall = b.walls.get(i);
 			}
 		}
 		

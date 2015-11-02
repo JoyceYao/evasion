@@ -20,4 +20,6 @@ java -jar evasionServer.jar -p1337 -N3 -M10 -Hcly -Pmv
 
 Client:
 java -jar evasionClient.jar -rH -sR -tcly -p1337 -N3 -M10 -U1991
-java -cp evasionClient.jar:../lib/* Main
+java -cp evasionClient.jar:../lib/* evasion.Main
+
+
