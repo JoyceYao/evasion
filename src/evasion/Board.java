@@ -131,17 +131,18 @@ public class Board {
 	
 	public Wall getWallThatRunsThrough(Location a) {
 		for (Wall aw : _walls) {
-			if (aw.leftEnd.xloc == a.xloc) {
-				return aw;
-			}
-			if (aw.rightEnd.xloc == a.xloc) {
-				return aw;
-			}
-			if (aw.leftEnd.yloc == a.yloc) {
-				return aw;
-			}
-			if (aw.rightEnd.yloc == a.yloc) {
-				return aw;
+			if (aw.getOrientation() == Orientation.VERTICAL) {
+				if (aw.leftEnd.xloc == a.xloc) {
+					if ( (aw.leftEnd.yloc <= a.yloc) && (a.yloc <= aw.rightEnd.yloc) ) {
+						return aw;
+					}
+				}				
+			} else {//horizontal wall
+				if (aw.leftEnd.yloc == a.yloc) {
+					if ( (aw.leftEnd.xloc <= a.xloc) && (a.xloc <= aw.rightEnd.xloc) ) {
+						return aw;
+					}
+				}
 			}
 		}
 		return null;
@@ -149,17 +150,18 @@ public class Board {
 	
 	public boolean aWallRunsThrough(Location a) {
 		for (Wall aw : _walls) {
-			if (aw.leftEnd.xloc == a.xloc) {
-				return true;
-			}
-			if (aw.rightEnd.xloc == a.xloc) {
-				return true;
-			}
-			if (aw.leftEnd.yloc == a.yloc) {
-				return true;
-			}
-			if (aw.rightEnd.yloc == a.yloc) {
-				return true;
+			if (aw.getOrientation() == Orientation.VERTICAL) {
+				if (aw.leftEnd.xloc == a.xloc) {
+					if ( (aw.leftEnd.yloc <= a.yloc) && (a.yloc <= aw.rightEnd.yloc) ) {
+						return true;
+					}
+				}				
+			} else {//horizontal wall
+				if (aw.leftEnd.yloc == a.yloc) {
+					if ( (aw.leftEnd.xloc <= a.xloc) && (a.xloc <= aw.rightEnd.xloc) ) {
+						return true;
+					}
+				}
 			}
 		}
 		return false;
