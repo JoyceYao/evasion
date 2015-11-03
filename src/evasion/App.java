@@ -50,6 +50,7 @@ public class App {
 	                        session.getBasicRemote().sendText(SENT_MESSAGE);
 	                        SENT_MESSAGE = getWallsCommand();
 	                        session.getBasicRemote().sendText(SENT_MESSAGE);
+	                        System.out.println("After a set of calls");
                         } while(true);
                     } catch (IOException | InterruptedException e) {
                         e.printStackTrace();

@@ -17,7 +17,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 	@Override
 	public PreyMove makeAMove(Board bd) {
 		
-		if(b.prevHunterLocs.size() == 0){
+		if(b.prevHunterMoves.size() == 0){
 			return getInitailPreyMove();
 		}else{
 			return getBestDirection(bd, b._hunter.hl, b._prey.pl);
@@ -40,7 +40,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		int thisFromX = pl.xloc;
 		int thisFromY = pl.yloc;
 
-		Move hm = b.prevHunterLocs.get(b.prevHunterLocs.size()-1);
+		Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
 		
 		int bestDeltaX = 0;
 		int bestDeltaY = 0;

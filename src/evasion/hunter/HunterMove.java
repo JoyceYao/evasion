@@ -3,13 +3,16 @@ package evasion.hunter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import evasion.CardinalDirections;
 import evasion.Move;
 import evasion.Wall;
 
 public class HunterMove extends Move {
 	public Wall buildWall;
-	public Wall teardownWall;
+	public List<Wall> teardownWalls;
 	
 	public String toString() {
 		JSONObject obj = new JSONObject();
@@ -74,12 +77,16 @@ public class HunterMove extends Move {
 	}
 	
 	public String tearDownWallToString() throws JSONException {
-		if (teardownWall == null) {
+		if (teardownWalls == null) {
 			return "";
 		}
 		JSONObject obj = new JSONObject();
 		obj.put("Command", "D");
-		obj.put("wallIndex", teardownWall.wallIndex);
+		List<Integer> wids = new LinkedList<Integer>();
+		for (Wall aw : teardownWalls) {
+			wids.add(aw.wallIndex);
+		}
+		obj.put("wallIndex", wids);
 		return obj.toString();
 	}
 	

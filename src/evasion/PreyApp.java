@@ -1,6 +1,7 @@
 package evasion;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +13,16 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import org.glassfish.tyrus.client.ClientManager;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import evasion.hunter.HunterMove;
+import evasion.hunter.strategies.AbsHunterStrategy;
 import evasion.prey.PreyMove;
+import evasion.prey.strategies.AbsPreyStrategy;
 
 public class PreyApp {
 	private static CountDownLatch messageLatch;
@@ -35,7 +41,8 @@ public class PreyApp {
             final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
 
             ClientManager client = ClientManager.createClient();
-            
+            AbsPreyStrategy pstrategy = AbsPreyStrategy.getStrategy("W");
+            Board board = new Board();
             Endpoint prey = new Endpoint() {
 
 				@Override
@@ -48,7 +55,8 @@ public class PreyApp {
                             }
                         });
                         for (;;) {
-                            session.getBasicRemote().sendText(makeARandomMove());
+                            //session.getBasicRemote().sendText(makeARandomMove());
+                        	session.getBasicRemote().sendText(pstrategy.makeAMove(board).toString());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
@@ -123,7 +131,7 @@ public class PreyApp {
 			e.printStackTrace();
 		}
         return action;
-    }
+    } 
     
 
 }
