@@ -33,16 +33,21 @@ public class HunterMove extends Move {
 		return obj.toString();
 	}
 	
-	public String moveToString() throws JSONException {
-		JSONObject obj = new JSONObject();
-		obj.put("Command", "M");
-		CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
-		if (d == CardinalDirections.NOMOVE) {
+	public String moveToString() {
+		try{
+			JSONObject obj = new JSONObject();
+			obj.put("Command", "M");
+			CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
+			if (d == CardinalDirections.NOMOVE) {
 			
-		} else {
-			obj.put("direction", d);
+			} else {
+				obj.put("direction", d);
+			}
+			return obj.toString();
+		}catch(Exception e){
+			
 		}
-		return obj.toString();
+		return "";
 	}
 
 	public String buildWallToString() throws JSONException {

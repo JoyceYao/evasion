@@ -24,6 +24,7 @@ public class Board {
 	public Hunter h;
 	public Prey p;
 	public List<Wall> walls;
+	public List<Move> prevHunterLocs;
 	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
@@ -32,12 +33,14 @@ public class Board {
 		walls = new ArrayList<Wall>();
 		h.hl.xloc = 0; h.hl.yloc = 0;
 		p.pl.xloc = PREY_INIT_X; p.pl.yloc = PREY_INIT_Y;
+		prevHunterLocs = new ArrayList<Move>();
 	}
 	public void addHunterMove(HunterMove hm) {
 		HunterMove ehm = getEffectiveHunterMove(hm);
 		h.hl.xloc += ehm.deltaX;
 		h.hl.yloc += ehm.deltaY;
 		//build or tear walls down
+		prevHunterLocs.add(hm);
 	}
 	
 	public void addPreyMove(PreyMove pm) {
@@ -94,5 +97,13 @@ public class Board {
 	public static double getDistanceSq(Location a, Location b) {
 		return ((a.xloc - b.xloc)*(a.xloc - b.xloc) + 
 				(a.yloc - b.yloc)*(a.yloc - b.yloc));
+	}
+	
+	public boolean testWillBeCaught(Location a, Location b) {
+		double distsq = getDistanceSq(a, b);
+		if ( (distsq < SQ_CAPTURE_DIST) && !wallExistsBetween(a, b) ) {
+			return true;
+		}
+		return false;
 	}
 }

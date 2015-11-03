@@ -19,6 +19,8 @@ public abstract class AbsPreyStrategy {
 		switch (str) {
 			case "R":
 				return new PRRandomV1();
+			case "M":
+				return new MaxSpaceStrategy();
 			default:
 				return new PRRandomV1();
 		}

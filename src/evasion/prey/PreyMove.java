@@ -9,21 +9,18 @@ public class PreyMove extends Move {
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("Command", "M");
+			CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
+			if (d == CardinalDirections.NOMOVE) {
+			
+			} else {
+				obj.put("direction", d);
+			}
+			return obj.toString();
+		
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
-		if (d == CardinalDirections.NOMOVE) {
-			
-		} else {
-			try {
-				obj.put("direction", d);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return obj.toString();
+		return "";
 	}
 }

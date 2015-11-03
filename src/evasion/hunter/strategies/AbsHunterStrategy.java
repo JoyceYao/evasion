@@ -14,11 +14,13 @@ public abstract class AbsHunterStrategy {
 	}
 	
 	public static AbsHunterStrategy getStrategy(String str) {
-		switch (str) {
-			case "R":
-				return new HSRandomV1();
-			default:
-				return new HSRandomV1();
-		}
+		//switch (str) {
+		//	case "R":
+		//		return new HSRandomV1();
+		//	case "M":
+				return new MinSpaceStrategy();
+		//	default:
+		//		return new HSRandomV1();
+		//}
 	}
 }

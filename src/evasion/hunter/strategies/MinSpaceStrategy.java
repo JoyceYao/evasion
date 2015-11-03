@@ -11,16 +11,14 @@ import evasion.hunter.HunterMove;
 import evasion.prey.Prey;
 
 public class MinSpaceStrategy extends AbsHunterStrategy {
-	
-	public List<Wall> verticalWalls = new ArrayList<Wall>();
-	public List<Wall> horizontalWalls = new ArrayList<Wall>();
-	
+
 	List<HunterMove> hunterMoveHist = new ArrayList<HunterMove>();
 	int wallIdx = 0;
 	List<Integer> innerWall = new ArrayList<Integer>();
 
 	@Override
 	public HunterMove makeAMove(Board b) {
+		System.out.println("MinSpaceStrategy makeAMove");
 		HunterMove hm = null;
 		if(hunterMoveHist.size() == 0){
 			hm = getInitialMove();
@@ -34,7 +32,6 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			if (b.wallExistsBetween(b.h.hl, new Location(nextX, nextY))){
 				hm.buildWall = getWall(b, prevMove, b.p);
 			}
-			
 		}
 		
 		// remove extra walls
@@ -45,10 +42,12 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			}
 		}
 		
+		System.out.println(hm.moveToString());
 		return hm;
 	}
 	
 	private HunterMove getInitialMove(){
+		System.out.println("MinSpaceStrategy getInitialMove");
 		HunterMove hm = new HunterMove();
 		hm.buildWall = null;
 		hm.teardownWall = null;
@@ -61,82 +60,28 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	private Wall getWall(Board b, HunterMove prevHM,  Prey p){
 		if(prevHM.fromX-p.pl.xloc < 2 || prevHM.fromY-p.pl.yloc < 2){
 			//get smallest enclosing wall
-			return getSmallestEnclosingWall(b, new Location(prevHM.fromX, prevHM.fromY), new Location(prevHM.fromX+prevHM.deltaX, prevHM.fromY+prevHM.deltaY), p.pl);
+			return getSmallestEnclosingWall(b.walls, new Location(prevHM.fromX, prevHM.fromY), new Location(prevHM.fromX+prevHM.deltaX, prevHM.fromY+prevHM.deltaY), p.pl);
 		} else {
 			return null;
 		}
 	}
-
-	/*
-	private List<Location> getIntersects(){
-		List<Location> intersects = new ArrayList<Location>();
-		for(int i=0; i<verticalWalls.size(); i++){
-			for(int j=0; j<horizontalWalls.size(); j++){
-				Wall v = verticalWalls.get(i);
-				Wall h = horizontalWalls.get(j);
-				Location inter = getIntersect(v, h);
-				if(inter != null){
-					intersects.add(inter);
-				}
-			}
-		}
-		
-		for(int i=0; i<verticalWalls.size(); i++){
-			Wall v = verticalWalls.get(i);
-			if(v.leftEnd.yloc == Board.MIN_Y || v.rightEnd.yloc == Board.MIN_Y){
-				intersects.add(new Location(v.leftEnd.xloc, Board.MIN_Y));
-			}
-			if(v.leftEnd.yloc == Board.MAX_Y || v.rightEnd.yloc == Board.MAX_Y){
-				intersects.add(new Location(v.leftEnd.xloc, Board.MAX_Y));
-			}
-		}
-		
-		for(int j=0; j<horizontalWalls.size(); j++){
-			Wall h = horizontalWalls.get(j);
-			if(h.leftEnd.xloc == Board.MIN_X || h.rightEnd.xloc == Board.MIN_X){
-				intersects.add(new Location(Board.MIN_X, h.leftEnd.yloc));
-			}
-			if(h.leftEnd.yloc == Board.MAX_X || h.rightEnd.yloc == Board.MAX_X){
-				intersects.add(new Location(Board.MAX_X, h.leftEnd.yloc));
-			}
-		}
-		
-		intersects.add(new Location(Board.MIN_X, Board.MIN_Y));
-		intersects.add(new Location(Board.MAX_X, Board.MAX_Y));
-		intersects.add(new Location(Board.MIN_X, Board.MAX_Y));
-		intersects.add(new Location(Board.MAX_X, Board.MIN_Y));
-		return intersects;
-	}
 	
-	private Location getIntersect(Wall v, Wall h){
-		int minX = Math.min(h.leftEnd.xloc, h.rightEnd.xloc);
-		int maxX = Math.max(h.leftEnd.xloc, h.rightEnd.xloc);
-		
-		int minY = Math.min(v.leftEnd.yloc, v.rightEnd.yloc);
-		int maxY = Math.max(v.leftEnd.yloc, v.rightEnd.yloc);
-		if(v.leftEnd.xloc <= maxX && v.leftEnd.xloc >= minX && h.leftEnd.yloc >= minY && h.leftEnd.yloc <= maxY){
-			return new Location(v.leftEnd.xloc, h.leftEnd.yloc);
-		}
-		return null;
-	}*/
-	
-	
-	private Wall getSmallestEnclosingWall(Board b, Location hl, Location hl2, Location pl){
+	private Wall getSmallestEnclosingWall(List<Wall> walls, Location hl, Location hl2, Location pl){
 		// get enclosing space before building new wall
-		int WWallIdx = getWWallIdx(b, Math.max(hl.xloc, pl.xloc));
-		int EWallIdx = getEWallIdx(b, Math.min(hl.xloc, pl.xloc));
-		int NWallIdx = getNWallIdx(b, Math.min(hl.yloc, pl.yloc));
-		int SWallIdx = getSWallIdx(b, Math.max(hl.yloc, pl.yloc));
+		int WWallIdx = getWWallIdx(walls, Math.max(hl.xloc, pl.xloc));
+		int EWallIdx = getEWallIdx(walls, Math.min(hl.xloc, pl.xloc));
+		int NWallIdx = getNWallIdx(walls, Math.min(hl.yloc, pl.yloc));
+		int SWallIdx = getSWallIdx(walls, Math.max(hl.yloc, pl.yloc));
 		
-		int minX = EWallIdx == -1 ? Board.MIN_X : b.walls.get(EWallIdx).leftEnd.xloc;
-		int maxX = WWallIdx == -1 ? Board.MAX_X : b.walls.get(WWallIdx).leftEnd.xloc;
-		int minY = NWallIdx == -1 ? Board.MIN_Y : b.walls.get(NWallIdx).leftEnd.yloc;
-		int maxY = SWallIdx == -1 ? Board.MAX_Y : b.walls.get(SWallIdx).leftEnd.yloc;
+		int minX = EWallIdx == -1 ? Board.MIN_X : walls.get(EWallIdx).leftEnd.xloc;
+		int maxX = WWallIdx == -1 ? Board.MAX_X : walls.get(WWallIdx).leftEnd.xloc;
+		int minY = NWallIdx == -1 ? Board.MIN_Y : walls.get(NWallIdx).leftEnd.yloc;
+		int maxY = SWallIdx == -1 ? Board.MAX_Y : walls.get(SWallIdx).leftEnd.yloc;
 		
 		int area = (maxX-minX)*(maxY-minY);
 		
-		Location hwstart = new Location(b.walls.get(EWallIdx).leftEnd.xloc, hl.yloc);
-		Location hwend = new Location(b.walls.get(WWallIdx).leftEnd.xloc, hl.yloc);
+		Location hwstart = new Location(walls.get(EWallIdx).leftEnd.xloc, hl.yloc);
+		Location hwend = new Location(walls.get(WWallIdx).leftEnd.xloc, hl.yloc);
 		Wall hWall = new Wall(hwstart, hwend, WallOperation.BUILD, wallIdx);
 		
 		int hWallArea = 0;
@@ -146,8 +91,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			hWallArea = (maxX-minX)*(maxY-hl.yloc);
 		}
 		
-		Location vwstart = new Location(hl.xloc, b.walls.get(NWallIdx).leftEnd.yloc);
-		Location vwend = new Location(hl.xloc, b.walls.get(SWallIdx).leftEnd.yloc);
+		Location vwstart = new Location(hl.xloc, walls.get(NWallIdx).leftEnd.yloc);
+		Location vwend = new Location(hl.xloc, walls.get(SWallIdx).leftEnd.yloc);
 		Wall vWall = new Wall(vwstart, vwend, WallOperation.BUILD, wallIdx);
 		
 		int vWallArea = 0;
@@ -161,70 +106,103 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		
 		// set inner walls list
 		innerWall.clear();
-		innerWall.add(b.walls.get(EWallIdx).wallIndex);
-		innerWall.add(b.walls.get(WWallIdx).wallIndex);
-		innerWall.add(b.walls.get(NWallIdx).wallIndex);
-		innerWall.add(b.walls.get(SWallIdx).wallIndex);
+		innerWall.add(walls.get(EWallIdx).wallIndex);
+		innerWall.add(walls.get(WWallIdx).wallIndex);
+		innerWall.add(walls.get(NWallIdx).wallIndex);
+		innerWall.add(walls.get(SWallIdx).wallIndex);
 		Wall result = hWallArea < vWallArea ? hWall : vWall;
-		b.walls.add(result);
+		walls.add(result);
 		innerWall.add(result.wallIndex);
 		return result;
 	}
 	
-	private int getWWallIdx(Board b, int x){
+	public int getInnerWallArea(List<Wall> walls, Location hl, Location pl){
+		// get enclosing space before building new wall
+		int WWallIdx = getWWallIdx(walls, Math.max(hl.xloc, pl.xloc));
+		int EWallIdx = getEWallIdx(walls, Math.min(hl.xloc, pl.xloc));
+		int NWallIdx = getNWallIdx(walls, Math.min(hl.yloc, pl.yloc));
+		int SWallIdx = getSWallIdx(walls, Math.max(hl.yloc, pl.yloc));
+		
+		int minX = EWallIdx == -1 ? Board.MIN_X : walls.get(EWallIdx).leftEnd.xloc;
+		int maxX = WWallIdx == -1 ? Board.MAX_X : walls.get(WWallIdx).leftEnd.xloc;
+		int minY = NWallIdx == -1 ? Board.MIN_Y : walls.get(NWallIdx).leftEnd.yloc;
+		int maxY = SWallIdx == -1 ? Board.MAX_Y : walls.get(SWallIdx).leftEnd.yloc;
+		
+		int area = (maxX-minX)*(maxY-minY);
+		return area;
+	}
+	
+	private int getWWallIdx(List<Wall> walls, int x){
 		int currIdx = -1;
-		for(int i=0; i<b.walls.size(); i++){
-			Wall w = b.walls.get(i);
+		for(int i=0; i<walls.size(); i++){
+			Wall w = walls.get(i);
 			// if this a a vertical wall, and on the right of my current position
 			// and smaller than current west end
 			if(isVerticalWall(w) && w.leftEnd.xloc > x 
-					&& (currIdx == -1 || b.walls.get(currIdx).leftEnd.xloc > w.leftEnd.xloc)){
+					&& (currIdx == -1 || walls.get(currIdx).leftEnd.xloc > w.leftEnd.xloc)){
 				currIdx = i;
 			}
 		}
 		return currIdx;
 	}
 	
-	private int getEWallIdx(Board b, int x){
+	private int getEWallIdx(List<Wall> walls, int x){
 		int currIdx = -1;
-		for(int i=0; i<b.walls.size(); i++){
-			Wall w = b.walls.get(i);
+		for(int i=0; i<walls.size(); i++){
+			Wall w = walls.get(i);
 			// if this a a vertical wall, and on the right of my current position
 			// and smaller than current west end
 			if(isVerticalWall(w) && w.leftEnd.xloc < x 
-					&& (currIdx == -1 || b.walls.get(currIdx).leftEnd.xloc < w.leftEnd.xloc)){
+					&& (currIdx == -1 || walls.get(currIdx).leftEnd.xloc < w.leftEnd.xloc)){
 				currIdx = i;
 			}
 		}
 		return currIdx;
 	}
 	
-	private int getNWallIdx(Board b, int y){
+	private int getNWallIdx(List<Wall> walls, int y){
 		int currIdx = -1;
-		for(int i=0; i<b.walls.size(); i++){
-			Wall w = b.walls.get(i);
+		for(int i=0; i<walls.size(); i++){
+			Wall w = walls.get(i);
 			// if this a a vertical wall, and on the right of my current position
 			// and smaller than current west end
 			if(isHorizontalWall(w) && w.leftEnd.yloc < y 
-					&& (currIdx == -1 || b.walls.get(currIdx).leftEnd.yloc < w.leftEnd.yloc)){
+					&& (currIdx == -1 || walls.get(currIdx).leftEnd.yloc < w.leftEnd.yloc)){
 				currIdx = i;
 			}
 		}
 		return currIdx;
 	}
 
-	private int getSWallIdx(Board b, int y){
+	private int getSWallIdx(List<Wall> walls, int y){
 		int currIdx = -1;
-		for(int i=0; i<b.walls.size(); i++){
-			Wall w = b.walls.get(i);
+		for(int i=0; i<walls.size(); i++){
+			Wall w = walls.get(i);
 			// if this a a vertical wall, and on the right of my current position
 			// and smaller than current west end
 			if(isHorizontalWall(w) && w.leftEnd.yloc > y 
-					&& (currIdx == -1 || b.walls.get(currIdx).leftEnd.yloc > w.leftEnd.yloc)){
+					&& (currIdx == -1 || walls.get(currIdx).leftEnd.yloc > w.leftEnd.yloc)){
 				currIdx = i;
 			}
 		}
 		return currIdx;
+	}
+	
+	public Location[] getMinMaxXY(List<Wall> walls, Location hl, Location pl){
+		int WWallIdx = getWWallIdx(walls, Math.max(hl.xloc, pl.xloc));
+		int EWallIdx = getEWallIdx(walls, Math.min(hl.xloc, pl.xloc));
+		int NWallIdx = getNWallIdx(walls, Math.min(hl.yloc, pl.yloc));
+		int SWallIdx = getSWallIdx(walls, Math.max(hl.yloc, pl.yloc));
+		
+		int minX = EWallIdx == -1 ? Board.MIN_X : walls.get(EWallIdx).leftEnd.xloc;
+		int maxX = WWallIdx == -1 ? Board.MAX_X : walls.get(WWallIdx).leftEnd.xloc;
+		int minY = NWallIdx == -1 ? Board.MIN_Y : walls.get(NWallIdx).leftEnd.yloc;
+		int maxY = SWallIdx == -1 ? Board.MAX_Y : walls.get(SWallIdx).leftEnd.yloc;
+		
+		Location[] result = new Location[2];
+		result[0] = new Location(minX, minY);
+		result[1] = new Location(maxX, maxY);
+		return result;
 	}
 	
 	private boolean isVerticalWall(Wall w){

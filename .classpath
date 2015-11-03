@@ -8,7 +8,10 @@
 	<classpathentry kind="lib" path="lib/tyrus-container-grizzly-client-1.12.jar"/>
 	<classpathentry kind="lib" path="lib/tyrus-server-1.12.jar"/>
 	<classpathentry kind="lib" path="D:/HPS_HW/org.json-20120521.jar"/>
-	<classpathentry kind="lib" path="D:/HPS_HW/tyrus-core-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/javaee-api-7.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/tyrus-core-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/evasion-0.0.1-SNAPSHOT-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/tyrus-spi-1.12.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
