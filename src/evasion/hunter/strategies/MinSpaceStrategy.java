@@ -29,6 +29,10 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			HunterMove prevMove = hunterMoveHist.get(hunterMoveHist.size()-1);
 			int nextX = b.h.hl.xloc + prevMove.deltaX;
 			int nextY = b.h.hl.yloc + prevMove.deltaY;
+			hm.fromX = b.h.hl.xloc;
+			hm.fromY = b.h.hl.yloc;
+			hm.deltaX = prevMove.deltaX;
+			hm.deltaY = prevMove.deltaY;
 			if (b.wallExistsBetween(b.h.hl, new Location(nextX, nextY))){
 				hm.buildWall = getWall(b, prevMove, b.p);
 			}
@@ -42,6 +46,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			}
 		}
 		
+		hunterMoveHist.add(hm);
+		b.addHunterMove(hm);
 		System.out.println(hm.moveToString());
 		return hm;
 	}
