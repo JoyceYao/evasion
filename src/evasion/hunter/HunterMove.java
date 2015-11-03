@@ -1,5 +1,8 @@
 package evasion.hunter;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.json.JSONObject;
 
 import evasion.CardinalDirections;
@@ -8,7 +11,7 @@ import evasion.Wall;
 
 public class HunterMove extends Move {
 	public Wall buildWall;
-	public Wall teardownWall;
+	public List<Wall> teardownWalls;
 	
 	public String toString() {
 		JSONObject obj = new JSONObject();
@@ -58,12 +61,16 @@ public class HunterMove extends Move {
 	}
 	
 	public String tearDownWallToString() {
-		if (teardownWall == null) {
+		if (teardownWalls == null) {
 			return "";
 		}
 		JSONObject obj = new JSONObject();
 		obj.put("Command", "D");
-		obj.put("wallIndex", teardownWall.wallIndex);
+		List<Integer> wids = new LinkedList<Integer>();
+		for (Wall aw : teardownWalls) {
+			wids.add(aw.wallIndex);
+		}
+		obj.put("wallIndex", wids);
 		return obj.toString();
 	}
 	

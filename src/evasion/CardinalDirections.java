@@ -64,7 +64,86 @@ public enum CardinalDirections {
 		return getCardinalDirsFromLocns(ln, w.leftEnd);
 	}
 
-	//from a to b is NE? NW?...
+	public static CardinalDirections getReverseDir(CardinalDirections dir) {
+		switch(dir) {
+			case N: return S;
+			case S: return N;
+			case E: return W;
+			case W: return E;
+			case NE: return SW;
+			case SE: return NW;
+			case NW: return SE;
+			default: return NE;//SW
+		}		
+	}
+
+	//As reflected from a horizontal wall
+	public static CardinalDirections getHorizontalReflectedDir(CardinalDirections dir) {
+		switch(dir) {
+			case N: return S;
+			case S: return N;
+			case E: return E;//no reflection
+			case W: return W;//no refl
+			case NE: return SE;
+			case SE: return NE;
+			case NW: return SW;
+			default: return NW;//SW
+		}
+	}
+
+	//As reflected from a vertical wall
+	public static CardinalDirections getVerticalReflectedDir(CardinalDirections dir) {
+		switch(dir) {
+			case N: return N;//no reflection
+			case S: return S;//no refl
+			case E: return W;
+			case W: return E;
+			case NE: return NW;
+			case SE: return SW;
+			case NW: return NE;
+			default: return SE;//SW
+		}
+	}
+
+	//As reflected from a horizontal wall
+	public static CardinalDirections getReflectedDirFromOriginalDirAndFinalDelta(CardinalDirections odir, int dx, int dy) {
+		switch(odir) {
+			case NE: 
+				if ( (dx == 0) && (dy == -1) ) {
+					return NW;
+				}
+				if ( (dx == 1) && (dy == 0) ) {
+					return SE;
+				}
+				return SW;
+			case SE: 
+				if ( (dx == 0) && (dy == 1) ) {
+					return SW;
+				}
+				if ( (dx == 1) && (dy == 0) ) {
+					return NE;
+				}
+				return NW;
+			case NW: 
+				if ( (dx == 0) && (dy == 1) ) {
+					return NE;
+				}
+				if ( (dx == -1) && (dy == 0) ) {
+					return SW;
+				}
+				return SE;
+			default: //SW
+				if ( (dx == 0) && (dy == 1) ) {
+					return SE;
+				}
+				if ( (dx == -1) && (dy == 0) ) {
+					return NW;
+				}
+				return NE;
+		}
+	}
+
+	//going from a to ==> b is NE? NW?...
 	public static CardinalDirections getCardinalDirsFromLocns(Location a, Location b) {
 		int deltaX = b.xloc - a.xloc;
 		int deltaY = b.yloc - a.yloc;

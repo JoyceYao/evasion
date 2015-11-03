@@ -37,14 +37,51 @@ public class Board {
 		HunterMove ehm = getEffectiveHunterMove(hm);
 		_hunter.hl.xloc += ehm.deltaX;
 		_hunter.hl.yloc += ehm.deltaY;
-		_hunter.hunterDirection = CardinalDirections.getDirectionFromMove(hm);
+		CardinalDirections origDir = CardinalDirections.getDirectionFromMove(hm);
+		CardinalDirections newDir = CardinalDirections.getDirectionFromMove(ehm);
+		if (origDir == newDir) {
+			_hunter.hunterDirection = origDir;
+		} else {
+			if ( (ehm.deltaX == 0) && (ehm.deltaY == 0) ) {//reflected straight back from a corner or vertical/horizontal wall
+				_hunter.hunterDirection = CardinalDirections.getReverseDir(origDir);
+			} else {
+				_hunter.hunterDirection = CardinalDirections.getReflectedDirFromOriginalDirAndFinalDelta(origDir, ehm.deltaX, ehm.deltaY);
+			}
+		}
+		
 		//build or tear walls down
+		_walls.add(hm.buildWall);
+		for (Wall aw:hm.teardownWalls) {
+			removeWall(aw.wallIndex);
+		}
+	}
+	
+	public void removeWall(int idx) {
+		int i = 0;
+		for(Wall w:_walls) {
+			if (w.wallIndex == idx) {
+				_walls.remove(i);
+				return;
+			}
+			i++;
+		}
 	}
 	
 	public void addPreyMove(PreyMove pm) {
 		PreyMove epm = getEffectivePreyMove(pm);
 		_prey.pl.xloc += epm.deltaX;
 		_prey.pl.yloc += epm.deltaY;
+		CardinalDirections origDir = CardinalDirections.getDirectionFromMove(pm);
+		CardinalDirections newDir = CardinalDirections.getDirectionFromMove(epm);
+		if (origDir == newDir) {
+			_prey.preyDirection = origDir;
+		} else {
+			if ( (epm.deltaX == 0) && (epm.deltaY == 0) ) {//reflected straight back from a corner or vertical/horizontal wall
+				_prey.preyDirection = CardinalDirections.getReverseDir(origDir);
+			} else {
+				_prey.preyDirection = CardinalDirections.getReflectedDirFromOriginalDirAndFinalDelta(origDir, epm.deltaX, epm.deltaY);
+			}
+		}
 		
 	}
 	
