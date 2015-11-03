@@ -52,7 +52,8 @@ public class HuntApp {
                             }
                         });
                         for(;;) {
-                        	session.getBasicRemote().sendText(makeAMove(board, hstrategy));
+                        	//session.getBasicRemote().sendText(makeAMove(board, hstrategy));
+                        	session.getBasicRemote().sendText(makeARandomMove());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
@@ -156,7 +157,7 @@ public class HuntApp {
 		}
 
     	//M {command: "M", direction: "SE"}
-		if (randomNum == 1) {
+//		if (randomNum == 1) {
 			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
    	    	//ObjectNode node2 = mapper.createObjectNode();
 			HashMap<String, String> hm = new HashMap();
@@ -180,7 +181,9 @@ public class HuntApp {
 				e.printStackTrace();
 			}
 	        return action;
-		} else {//D {command: "D", index: 2} // delete wall at index 2
+//		}  
+		/**
+		else {//D {command: "D", index: 2} // delete wall at index 2
 			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
    	    	//ObjectNode node2 = mapper.createObjectNode();
 			HashMap<String, String> hm = new HashMap();
@@ -196,6 +199,7 @@ public class HuntApp {
 			}
 	        return action;	        
 		}
+		*/
 		
     }
 

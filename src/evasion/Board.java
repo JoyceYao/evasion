@@ -59,35 +59,31 @@ public class Board {
 	
 	//calculate move after bounces
 	public PreyMove getEffectivePreyMove(PreyMove pm) {
-//		if (!isValidPreyMove(pm)) {
-//			System.out.println("Invalid Prey Move");
-//			return null;
-//		}
 		Location target = new Location();
 		target.xloc = pm.fromX + pm.deltaX;
 		target.yloc = pm.fromY + pm.deltaY;
-		HunterMove effHm = new HunterMove();
+		PreyMove effm = new PreyMove();
+		effm.fromX = pm.fromX; effm.fromY = pm.fromY;
+		effm.deltaX = pm.deltaX; effm.deltaY = pm.deltaY;
 		
 		if (target.yloc > MAX_Y) {
-			effHm.deltaY = 0;
+			effm.deltaY = 0;
 		}
 		
 		if (target.xloc > MAX_X) {
-			effHm.deltaX = 0;
+			effm.deltaX = 0;
 		}
 		Wall aw = getWallThatRunsThrough(target);
 		if (aw != null) {		
 			if (aw.getOrientation() == Orientation.HORIZONTAL) {
-				effHm.deltaY = 0;
+				effm.deltaY = 0;
+			} else {
+				effm.deltaX = 0;
 			}
-		}
-		if (pm.deltaY + pm.deltaY > MAX_Y) {
-			
-		} else if (pm.fromX + pm.deltaX > MAX_X) {
-			pm.deltaX = 0;
-		}
-		
-		return pm;
+			return effm;
+		} else {
+			return effm;
+		}		
 	}
 	
 	public Wall getWallThatRunsThrough(Location a) {
