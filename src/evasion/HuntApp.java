@@ -48,17 +48,18 @@ public class HuntApp {
                         session.addMessageHandler(new MessageHandler.Whole<String>() {
                             public void onMessage(String message) {
                                 System.out.println("Received message: "+message);
+                                board.parseMessageAndUpdate(message);
                                 messageLatch.countDown();
                             }
                         });
                         for(;;) {
-                        	makeAMove(board, hstrategy, session);
                         	//session.getBasicRemote().sendText(makeARandomMove());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
-                        	
+                        	System.out.println("A new entry");
+                        	makeAMove(board, hstrategy, session);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -96,27 +97,16 @@ public class HuntApp {
         return action;
     }
 
-    public static void makeAMove(Board b, AbsHunterStrategy s, Session sn) throws IOException {
-    	HunterMove hm = s.makeAMove(b);
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-		String action = "";
-		try {
-			action = writer.writeValueAsString(hm.moveToString());
-			System.out.println("action: " + action);
-			//action = mapper.writeValueAsString(node1);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+    public static void makeAMove(Board b, AbsHunterStrategy st, Session sn) throws IOException {
+    	HunterMove hm = st.makeAMove(b);
+    	System.out.println("in making a move");		
 		sn.getBasicRemote().sendText(hm.buildWallToString());//Build wall
-		sn.getBasicRemote().sendText(hm.moveToString());//Move
+    	System.out.println("after build wall");
 		sn.getBasicRemote().sendText(hm.tearDownWallToString());//Delete wall
+		sn.getBasicRemote().sendText(hm.moveToString());//Move
     }
     
-    public static String makeARandomMove() {
+    public static String randomMoveDtls() {
     	String action = "";
     	ObjectMapper mapper = new ObjectMapper();
         Random rand = new Random();

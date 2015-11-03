@@ -1,8 +1,8 @@
 package evasion;
 
 public class Wall {
-	public Location leftEnd;
-	public Location rightEnd;
+	public Location leftEnd = new Location();
+	public Location rightEnd = new Location();
 	public WallOperation wop;
 	public int wallIndex;
 	public Orientation getOrientation() {

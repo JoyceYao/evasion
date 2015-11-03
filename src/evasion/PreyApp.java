@@ -48,11 +48,11 @@ public class PreyApp {
                             }
                         });
                         for (;;) {
-                            session.getBasicRemote().sendText(makeARandomMove());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);                        	
+                            session.getBasicRemote().sendText(makeARandomMove());
                         	
                         }
                         

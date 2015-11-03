@@ -33,9 +33,21 @@ public class HunterMove extends Move {
 //	}
 	
 	public String moveToString() {
-		JSONObject obj = new JSONObject();
-		obj.put("Command", "M");
-		return obj.toString();
+		
+    	ObjectMapper mapper = new ObjectMapper();
+		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
+		HashMap<String, Object>hm = new HashMap<String, Object>();
+		hm.put("command", "M");
+		String action = "";
+		try {
+			action = writer.writeValueAsString(hm);
+			System.out.println("action: " + action);
+			//action = mapper.writeValueAsString(node1);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return action;
 	}
 
 //	public String buildWallToString() {
@@ -62,25 +74,37 @@ public class HunterMove extends Move {
 //	}
 	
 	public String tearDownWallToString() {
-		if (teardownWalls == null) {
+		if (teardownWalls == null || teardownWalls.isEmpty()) {
 			return "";
 		}
-		JSONObject obj = new JSONObject();
-		obj.put("Command", "D");
-		List<Integer> wids = new LinkedList<Integer>();
-		for (Wall aw : teardownWalls) {
-			wids.add(aw.wallIndex);
-		}
-		obj.put("wallIndex", wids);
-		return obj.toString();
+
+	   	ObjectMapper mapper = new ObjectMapper();
+			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
+			HashMap<String, Object>hm = new HashMap<String, Object>();
+			hm.put("command", "D");
+			List<Integer> wids = new LinkedList<Integer>();
+			for (Wall aw : teardownWalls) {
+				wids.add(aw.wallIndex);
+			}
+			hm.put("wallIndex", wids);
+			String action = "";
+			try {
+				action = writer.writeValueAsString(hm);
+				System.out.println("action: " + action);
+				//action = mapper.writeValueAsString(node1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        return action;
 	}
 	
 	
 	public String buildWallToString() {
-    	if (buildWall == null) {
+    	if (buildWall == null || buildWall.leftEnd == null) {
     		return "";
     	}
-    	
+    	System.out.println("building wall command");
     	ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
 		HashMap<String, Object>hm = new HashMap<String, Object>();
