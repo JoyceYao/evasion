@@ -39,7 +39,7 @@ public class HuntApp {
 
             ClientManager client = ClientManager.createClient();
             Board board = new Board();
-            AbsHunterStrategy hstrategy = AbsHunterStrategy.getStrategy("W");
+            AbsHunterStrategy hstrategy = AbsHunterStrategy.getStrategy("R");
             Endpoint hunter = new Endpoint() {
 
 				@Override
@@ -52,8 +52,8 @@ public class HuntApp {
                             }
                         });
                         for(;;) {
-                        	//session.getBasicRemote().sendText(makeAMove(board, hstrategy));
-                        	session.getBasicRemote().sendText(makeARandomMove());
+                        	makeAMove(board, hstrategy, session);
+                        	//session.getBasicRemote().sendText(makeARandomMove());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
@@ -96,21 +96,24 @@ public class HuntApp {
         return action;
     }
 
-    public static String makeAMove(Board b, AbsHunterStrategy s) {
+    public static void makeAMove(Board b, AbsHunterStrategy s, Session sn) throws IOException {
     	HunterMove hm = s.makeAMove(b);
     	ObjectMapper mapper = new ObjectMapper();
+    	
 		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
 		String action = "";
 		try {
-			action = writer.writeValueAsString(hm);
+			action = writer.writeValueAsString(hm.moveToString());
 			System.out.println("action: " + action);
 			//action = mapper.writeValueAsString(node1);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        return action;
-    	
+		
+		sn.getBasicRemote().sendText(hm.buildWallToString());//Build wall
+		sn.getBasicRemote().sendText(hm.moveToString());//Move
+		sn.getBasicRemote().sendText(hm.tearDownWallToString());//Delete wall
     }
     
     public static String makeARandomMove() {
