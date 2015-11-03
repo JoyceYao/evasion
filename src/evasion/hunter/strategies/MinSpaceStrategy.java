@@ -49,6 +49,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			//if (b.wallExistsBetween(b._hunter.hl, new Location(nextX, nextY))){
 			Wall newWall = getWall(b, prevMove, b._prey);
 			
+			System.out.println("MinSpaceStrategy makeAMove[2-0] newWall=" + newWall);
+			
 			if(newWall != null){
 				
 				int overlapWallIdx = b.hasOverlapWall(newWall);
@@ -75,12 +77,13 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 					}
 				}
 				
-			}
-
-			//}
+			}	
+		
+			System.out.println("MinSpaceStrategy makeAMove[6-0]");
+			
 		}
 		
-		System.out.println("MinSpaceStrategy makeAMove[6]");
+		System.out.println("MinSpaceStrategy makeAMove[6-1]");
 		// remove extra walls
 		
 		

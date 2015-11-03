@@ -20,4 +20,30 @@ public class Wall {
 		this.wop = wop;
 		this.wallIndex = wallIndex;
 	}
+		
+	public int getLength() {
+		if (getOrientation() == Orientation.HORIZONTAL) {
+			return Math.abs(leftEnd.xloc - rightEnd.xloc);
+		}  
+		return Math.abs(leftEnd.yloc - rightEnd.yloc);
+	}
+
+	public CardinalDirections getWallDirFromLocation(Location a) {
+		Orientation on = getOrientation();
+		switch (on) {
+		case HORIZONTAL://a is in the neighborhood of leftEnd then E
+			if ( (Math.abs(a.xloc - leftEnd.xloc) <= 1) && (Math.abs(a.yloc - leftEnd.yloc) <=1)) {
+				return CardinalDirections.E;
+			}
+			return CardinalDirections.W;
+		default:
+			if ( (Math.abs(a.xloc - leftEnd.xloc) <= 1) && (Math.abs(a.yloc - leftEnd.yloc) <=1)) {
+				if (leftEnd.yloc < rightEnd.yloc) {
+					return CardinalDirections.S;					
+				}
+				return CardinalDirections.N;
+			}
+			return CardinalDirections.N;
+		}
+	}
 }

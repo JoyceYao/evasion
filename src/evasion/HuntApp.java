@@ -52,12 +52,12 @@ public class HuntApp {
                             }
                         });
                         for(;;) {
-                        	session.getBasicRemote().sendText(makeAMove(board, hstrategy));
+                        	makeAMove(board, hstrategy, session);
                         	//session.getBasicRemote().sendText(makeARandomMove());
-                            SENT_MESSAGE = getPositionsCommand();
-                            session.getBasicRemote().sendText(SENT_MESSAGE);
-                            SENT_MESSAGE = getWallsCommand();
-                            session.getBasicRemote().sendText(SENT_MESSAGE);
+                            //SENT_MESSAGE = getPositionsCommand();
+                            //session.getBasicRemote().sendText(SENT_MESSAGE);
+                            //SENT_MESSAGE = getWallsCommand();
+                            //session.getBasicRemote().sendText(SENT_MESSAGE);
                         	
                         }
                     } catch (IOException e) {
@@ -95,77 +95,32 @@ public class HuntApp {
 		}
         return action;
     }
-/*
-    public static String makeAMove(Board b, AbsHunterStrategy s) {
-    	System.out.println("makeAMove[0]");
+
+    public static void makeAMove(Board b, AbsHunterStrategy s, Session sn) throws IOException {
     	HunterMove hm = s.makeAMove(b);
     	ObjectMapper mapper = new ObjectMapper();
+    	
+    	System.out.println("makeAMove[0] hm=" + hm);
+    	System.out.println("makeAMove[0] hm.buildWall=" + hm.buildWall);
+    	System.out.println("makeAMove[0] hm.teardown=" + hm.teardownWalls);
+    	
 		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
 		String action = "";
 		try {
-			action = writer.writeValueAsString(hm.toString());
+			action = writer.writeValueAsString(hm.moveToString());
 			System.out.println("action: " + action);
 			//action = mapper.writeValueAsString(node1);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println("makeAMove[1] action=" + action);
-        return action;
-    	
-    }*/
-    
-    public static String makeAMove(Board b, AbsHunterStrategy s) {
-    	System.out.println("makeAMove[0]");
-    	HunterMove hm = s.makeAMove(b);
-    	ObjectMapper mapper = new ObjectMapper();
-		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-		String action = "";
-		try {
-			action = writer.writeValueAsString(hm.toString());
-			HashMap<String, Object> hmm = new HashMap<String, Object>();
-	    	HashMap<String, String> wall = new HashMap<String, String>();
-	    	
-	    	if(hm.buildWall != null){	
-	    		int xlen = Math.abs(hm.buildWall.leftEnd.xloc - hm.buildWall.rightEnd.xloc);
-	    		int ylen = Math.abs(hm.buildWall.leftEnd.yloc - hm.buildWall.rightEnd.yloc);
-	    		int wLen = xlen == 0? ylen : xlen;
-				wall.put("length", "" + wLen);
-				
-				String dir = "";
-				if(xlen == 0){
-					if(Math.abs(hm.fromY-hm.buildWall.leftEnd.yloc) > Math.abs(hm.fromY-hm.buildWall.rightEnd.yloc)){
-						dir = "N";
-					}else{
-						dir = "S";
-					}
-				}else{
-					if(Math.abs(hm.fromX-hm.buildWall.leftEnd.xloc) > Math.abs(hm.fromX-hm.buildWall.rightEnd.xloc)){
-						dir = "W";
-					}else{
-						dir = "E";
-					}		
-				}
-				wall.put("direction", dir);
-				hmm.put("wall", wall);
-	    	}
-
-			hmm.put("command", "B");
-
-			System.out.println("action: " + action);
-			//action = mapper.writeValueAsString(node1);
-			action = writer.writeValueAsString(hm);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//System.out.println("makeAMove[1] action=" + action);
-        return action;
-    	
-    }    
+		
+		if(hm.buildWallToString() != ""){ sn.getBasicRemote().sendText(hm.buildWallToString()); }//Build wall 
+		sn.getBasicRemote().sendText(hm.moveToString());//Move
+		if(hm.tearDownWallToString() != ""){ sn.getBasicRemote().sendText(hm.tearDownWallToString()); }//Delete wall
+    }
     
     public static String makeARandomMove() {
-    	System.out.println("makeARandomMove[0]");
     	String action = "";
     	ObjectMapper mapper = new ObjectMapper();
         Random rand = new Random();
@@ -205,8 +160,6 @@ public class HuntApp {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			System.out.println("makeARandomMove[1] action=" +action);
 	        return action;
 		}
 
