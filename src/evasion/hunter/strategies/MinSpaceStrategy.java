@@ -17,6 +17,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	List<Integer> innerWall = new ArrayList<Integer>();
 	int prevDeltaX = 1;
 	int prevDeltaY = 1;
+	int lastCreateWallTime = 0;
+	int currSteps = 0;
 
 	@Override
 	public HunterMove makeAMove(Board b) {
@@ -47,7 +49,9 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			//}
 			System.out.println("MinSpaceStrategy makeAMove[2] hm.deltaX=" + hm.deltaX + " hm.deltaY=" + hm.deltaY);
 			//if (b.wallExistsBetween(b._hunter.hl, new Location(nextX, nextY))){
-			Wall newWall = getWall(b, prevMove, b._prey);
+			Wall newWall = null;
+			
+			if(lastCreateWallTime + b.N < currSteps ){ newWall = getWall(b, prevMove, b._prey); }
 			
 			System.out.println("MinSpaceStrategy makeAMove[2-0] newWall=" + newWall);
 			
@@ -99,6 +103,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		HunterMove m = b.addHunterMove(hm);
 		System.out.println("MinSpaceStrategy makeAMove[8]");
 		hunterMoveHist.add(m);
+		m.buildWall = hm.buildWall;
+		m.teardownWalls = hm.teardownWalls;
 		System.out.println("MinSpaceStrategy makeAMove[9]");
 		System.out.println(m.moveToString());
 		System.out.println("MinSpaceStrategy makeAMove[10]");
@@ -113,6 +119,8 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy makeAMove[11] prevDeltaX=" + prevDeltaX + " prevDeltaY=" + prevDeltaY);
 
 		//if(hm.teardownWalls == null){ hm.teardownWalls = new ArrayList<Wall>(); }
+		currSteps++;
+		if(m.buildWall != null){ lastCreateWallTime = currSteps; }
 		return m;
 	}
 	
