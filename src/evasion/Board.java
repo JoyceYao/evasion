@@ -37,6 +37,7 @@ public class Board {
 		HunterMove ehm = getEffectiveHunterMove(hm);
 		h.hl.xloc += ehm.deltaX;
 		h.hl.yloc += ehm.deltaY;
+		h.hunterDirection = CardinalDirections.getDirectionFromMove(hm);
 		//build or tear walls down
 	}
 	
@@ -49,28 +50,92 @@ public class Board {
 	
 	//calculate move after bounces
 	public HunterMove getEffectiveHunterMove (HunterMove hm) {
-		if (!isValidHunterMove(hm)) {
-			System.out.println("Invalid Hunter Move");
-			return null;
-		}
+//		if (!isValidHunterMove(hm)) {
+//			System.out.println("Invalid Hunter Move");
+//			return null;
+//		}
 		return hm;
 	}
 	
 	//calculate move after bounces
 	public PreyMove getEffectivePreyMove(PreyMove pm) {
-		if (!isValidPreyMove(pm)) {
-			System.out.println("Invalid Prey Move");
-			return null;
+//		if (!isValidPreyMove(pm)) {
+//			System.out.println("Invalid Prey Move");
+//			return null;
+//		}
+		Location target = new Location();
+		target.xloc = pm.fromX + pm.deltaX;
+		target.yloc = pm.fromY + pm.deltaY;
+		HunterMove effHm = new HunterMove();
+		
+		if (target.yloc > MAX_Y) {
+			effHm.deltaY = 0;
 		}
+		
+		if (target.xloc > MAX_X) {
+			effHm.deltaX = 0;
+		}
+		Wall aw = getWallThatRunsThrough(target);
+		if (aw != null) {		
+			if (aw.getOrientation() == Orientation.HORIZONTAL) {
+				effHm.deltaY = 0;
+			}
+		}
+		if (pm.deltaY + pm.deltaY > MAX_Y) {
+			
+		} else if (pm.fromX + pm.deltaX > MAX_X) {
+			pm.deltaX = 0;
+		}
+		
 		return pm;
 	}
-	public boolean isValidHunterMove(HunterMove hm) {
+	
+	public Wall getWallThatRunsThrough(Location a) {
+		for (Wall aw : walls) {
+			if (aw.leftEnd.xloc == a.xloc) {
+				return aw;
+			}
+			if (aw.rightEnd.xloc == a.xloc) {
+				return aw;
+			}
+			if (aw.leftEnd.yloc == a.yloc) {
+				return aw;
+			}
+			if (aw.rightEnd.yloc == a.yloc) {
+				return aw;
+			}
+		}
+		return null;
+	}
+	
+	public boolean aWallRunsThrough(Location a) {
+		for (Wall aw : walls) {
+			if (aw.leftEnd.xloc == a.xloc) {
+				return true;
+			}
+			if (aw.rightEnd.xloc == a.xloc) {
+				return true;
+			}
+			if (aw.leftEnd.yloc == a.yloc) {
+				return true;
+			}
+			if (aw.rightEnd.yloc == a.yloc) {
+				return true;
+			}
+		}
 		return false;
 	}
 	
-	public boolean isValidPreyMove(PreyMove hm) {
-		return false;
-	}
+//	public boolean isValidHunterMove(HunterMove hm) {
+//		if (hm.fromX + hm.deltaX > MAX_X) {
+//			
+//		}
+//		return false;
+//	}
+	
+//	public boolean isValidPreyMove(PreyMove hm) {
+//		return false;
+//	}
 	
 	//Wall blocking straight line path
 	public Wall findWallBetween(Hunter h, Prey p) {

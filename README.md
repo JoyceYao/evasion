@@ -1,10 +1,7 @@
 # evasion
-jar cvfe evasionServer.jar  Server/ServerMain  *.class
+Prey:
+jar cvfe prey.jar evasion/PreyApp  */*.class 
 
-jar cvfe evasionClient.jar  evasion/Main  *.class
+Hunter:
+jar cvfe hunter.jar evasion/HuntApp  */*.class
 
-Server:
-java -jar evasionServer.jar -rH -sR -tcly -p1337 -N3 -M10
-
-Client:
-java -jar evasionClient.jar -p1337 -N3 -M10 -Hcly -Pmv
