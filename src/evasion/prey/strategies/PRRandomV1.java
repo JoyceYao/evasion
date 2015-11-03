@@ -12,7 +12,7 @@ public class PRRandomV1 extends AbsPreyStrategy{
 	public PreyMove makeAMove(Board bd) {
 		int randomNum = rand.nextInt(range); //NE, SE, SW, NW 
 		PreyMove pm = new PreyMove();
-		pm.fromX = b.p.pl.xloc; pm.fromY = b.p.pl.yloc;
+		pm.fromX = b._prey.pl.xloc; pm.fromY = b._prey.pl.yloc;
 		switch (randomNum) {
 			case 0: pm.deltaX = 1; pm.deltaY = -1; return pm; //NE
 			case 1: pm.deltaX = 1; pm.deltaY = 0; return pm; //E

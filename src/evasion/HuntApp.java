@@ -52,8 +52,8 @@ public class HuntApp {
                             }
                         });
                         for(;;) {
-                        	session.getBasicRemote().sendText(makeAMove(board, hstrategy));
-                        	//session.getBasicRemote().sendText(makeARandomMove());
+                        	//session.getBasicRemote().sendText(makeAMove(board, hstrategy));
+                        	session.getBasicRemote().sendText(makeARandomMove());
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();

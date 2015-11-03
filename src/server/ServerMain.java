@@ -56,7 +56,7 @@ public class ServerMain {
 					bs.set(2);
 					break;
 				case "-H": //hunter teamname
-					s.board.h.name = args[i].substring(2);
+					s.board._hunter.name = args[i].substring(2);
 					bs.set(3);
 					break;
 				default:

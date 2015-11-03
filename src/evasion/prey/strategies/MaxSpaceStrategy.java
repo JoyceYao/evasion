@@ -20,7 +20,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		if(b.prevHunterLocs.size() == 0){
 			return getInitailPreyMove();
 		}else{
-			return getBestDirection(bd, b.h.hl, b.p.pl);
+			return getBestDirection(bd, b._hunter.hl, b._prey.pl);
 		}
 	
 	}
@@ -54,7 +54,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 			for(int i=-1; i<=1; i++){
 				for(int j=-1; j<=1; j++){
 					if(b.testWillBeCaught(hl, pl)){ continue; }
-					int thisSpace = getWallSpace(b.walls, hl, pl, hm, i, j);
+					int thisSpace = getWallSpace(b._walls, hl, pl, hm, i, j);
 					if(maxWallSpace < thisSpace){
 						bestDeltaX = i;
 						bestDeltaY = j;
