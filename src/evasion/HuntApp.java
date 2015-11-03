@@ -18,6 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import evasion.hunter.HunterMove;
+import evasion.hunter.strategies.AbsHunterStrategy;
+
 public class HuntApp {
 	private static CountDownLatch messageLatch;
 	
@@ -35,7 +38,8 @@ public class HuntApp {
             final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
 
             ClientManager client = ClientManager.createClient();
-            
+            Board board = new Board();
+            AbsHunterStrategy hstrategy = AbsHunterStrategy.getStrategy("R");
             Endpoint hunter = new Endpoint() {
 
 				@Override
@@ -48,7 +52,7 @@ public class HuntApp {
                             }
                         });
                         for(;;) {
-                        	session.getBasicRemote().sendText(makeARandomMove());
+                        	session.getBasicRemote().sendText(makeAMove(board, hstrategy));
                             SENT_MESSAGE = getPositionsCommand();
                             session.getBasicRemote().sendText(SENT_MESSAGE);
                             SENT_MESSAGE = getWallsCommand();
@@ -91,7 +95,27 @@ public class HuntApp {
         return action;
     }
 
+    public static String makeAMove(Board b, AbsHunterStrategy s) {
+    	System.out.println("makeAMove[0]");
+    	HunterMove hm = s.makeAMove(b);
+    	ObjectMapper mapper = new ObjectMapper();
+		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
+		String action = "";
+		try {
+			action = writer.writeValueAsString(hm);
+			System.out.println("action: " + action);
+			//action = mapper.writeValueAsString(node1);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("makeAMove[1] action=" + action);
+        return action;
+    	
+    }
+    
     public static String makeARandomMove() {
+    	System.out.println("makeARandomMove[0]");
     	String action = "";
     	ObjectMapper mapper = new ObjectMapper();
         Random rand = new Random();
@@ -131,6 +155,8 @@ public class HuntApp {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			System.out.println("makeARandomMove[1] action=" +action);
 	        return action;
 		}
 
@@ -140,17 +166,17 @@ public class HuntApp {
    	    	//ObjectNode node2 = mapper.createObjectNode();
 			HashMap<String, String> hm = new HashMap();
 	        hm.put("command", "M"); 
-	        String dir = new String();
-			randomNum = rand.nextInt(9); //
-			
-			switch (randomNum) {
-				case 0: dir = "NE"; break;//NE
-				case 1: dir = "SE"; break;//SE
-				case 2: dir = "SW"; break;//SW
-				case 3: dir = "NW"; break;//NW
-				default: dir = "SE"; break;//SE
-			}
-			hm.put("direction", dir);
+//	        String dir = new String();
+//			randomNum = rand.nextInt(9); //
+//			
+//			switch (randomNum) {
+//				case 0: dir = "NE"; break;//NE
+//				case 1: dir = "SE"; break;//SE
+//				case 2: dir = "SW"; break;//SW
+//				case 3: dir = "NW"; break;//NW
+//				default: dir = "SE"; break;//SE
+//			}
+//			hm.put("direction", dir);
 			try {
 				action = writer.writeValueAsString(hm);
 				System.out.println("action: " + action);
