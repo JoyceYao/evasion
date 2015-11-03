@@ -12,7 +12,7 @@ public class HSRandomV1 extends AbsHunterStrategy{
 	@Override
 	public HunterMove makeAMove(Board b) {
 		HunterMove hm = new HunterMove();
-		hm.fromX = b.h.hl.xloc; hm.fromY = b.h.hl.yloc;
+		hm.fromX = b._hunter.hl.xloc; hm.fromY = b._hunter.hl.yloc;
 		int randomNum = rand.nextInt(wallChoice);
 		switch (randomNum) {
 			case 0: hm.buildWall = null; //No wall

@@ -21,56 +21,62 @@ public class Board {
 	public int M;//max walls
 	public int SQ_CAPTURE_DIST = 16;
 	
-	public Hunter h;
-	public Prey p;
-	public List<Wall> walls;
+	public Hunter _hunter;
+	public Prey _prey;
+	public List<Wall> _walls;
 	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
-		h = new Hunter();
-		p = new Prey();
-		walls = new ArrayList<Wall>();
-		h.hl.xloc = 0; h.hl.yloc = 0;
-		p.pl.xloc = PREY_INIT_X; p.pl.yloc = PREY_INIT_Y;
+		_hunter = new Hunter();
+		_prey = new Prey();
+		_walls = new ArrayList<Wall>();
+		_hunter.hl.xloc = 0; _hunter.hl.yloc = 0;
+		_prey.pl.xloc = PREY_INIT_X; _prey.pl.yloc = PREY_INIT_Y;
 	}
 	public void addHunterMove(HunterMove hm) {
 		HunterMove ehm = getEffectiveHunterMove(hm);
-		h.hl.xloc += ehm.deltaX;
-		h.hl.yloc += ehm.deltaY;
-		h.hunterDirection = CardinalDirections.getDirectionFromMove(hm);
+		_hunter.hl.xloc += ehm.deltaX;
+		_hunter.hl.yloc += ehm.deltaY;
+		_hunter.hunterDirection = CardinalDirections.getDirectionFromMove(hm);
 		//build or tear walls down
 	}
 	
 	public void addPreyMove(PreyMove pm) {
 		PreyMove epm = getEffectivePreyMove(pm);
-		p.pl.xloc += epm.deltaX;
-		p.pl.yloc += epm.deltaY;
+		_prey.pl.xloc += epm.deltaX;
+		_prey.pl.yloc += epm.deltaY;
 		
 	}
 	
 	//calculate move after bounces
 	public HunterMove getEffectiveHunterMove (HunterMove hm) {
-//		if (!isValidHunterMove(hm)) {
-//			System.out.println("Invalid Hunter Move");
-//			return null;
-//		}
-		return hm;
+		return (HunterMove) getEffectiveMove(hm);
 	}
 	
 	//calculate move after bounces
 	public PreyMove getEffectivePreyMove(PreyMove pm) {
+		return (PreyMove) getEffectiveMove(pm);
+	}
+	
+	public Move getEffectiveMove(Move mv) {
 		Location target = new Location();
-		target.xloc = pm.fromX + pm.deltaX;
-		target.yloc = pm.fromY + pm.deltaY;
-		PreyMove effm = new PreyMove();
-		effm.fromX = pm.fromX; effm.fromY = pm.fromY;
-		effm.deltaX = pm.deltaX; effm.deltaY = pm.deltaY;
+		target.xloc = mv.fromX + mv.deltaX;
+		target.yloc = mv.fromY + mv.deltaY;
+		Move effm = new Move();
+		effm.fromX = mv.fromX; effm.fromY = mv.fromY;
+		effm.deltaX = mv.deltaX; effm.deltaY = mv.deltaY;
 		
 		if (target.yloc > MAX_Y) {
 			effm.deltaY = 0;
 		}
+		if (target.yloc < MIN_Y) {
+			effm.deltaY = 0;
+		}
 		
 		if (target.xloc > MAX_X) {
+			effm.deltaX = 0;
+		}
+		if (target.xloc < MIN_X) {
 			effm.deltaX = 0;
 		}
 		Wall aw = getWallThatRunsThrough(target);
@@ -80,14 +86,14 @@ public class Board {
 			} else {
 				effm.deltaX = 0;
 			}
-			return effm;
+			return getEffectiveMove(effm);
 		} else {
 			return effm;
 		}		
 	}
 	
 	public Wall getWallThatRunsThrough(Location a) {
-		for (Wall aw : walls) {
+		for (Wall aw : _walls) {
 			if (aw.leftEnd.xloc == a.xloc) {
 				return aw;
 			}
@@ -105,7 +111,7 @@ public class Board {
 	}
 	
 	public boolean aWallRunsThrough(Location a) {
-		for (Wall aw : walls) {
+		for (Wall aw : _walls) {
 			if (aw.leftEnd.xloc == a.xloc) {
 				return true;
 			}
@@ -122,31 +128,81 @@ public class Board {
 		return false;
 	}
 	
-//	public boolean isValidHunterMove(HunterMove hm) {
-//		if (hm.fromX + hm.deltaX > MAX_X) {
-//			
-//		}
-//		return false;
-//	}
 	
-//	public boolean isValidPreyMove(PreyMove hm) {
-//		return false;
-//	}
-	
-	//Wall blocking straight line path
+	//Wall blocking straight line path from hunter to prey - a coarse estimate does not evaluate slanted lines connecting
+	//Hunter and Prey
 	public Wall findWallBetween(Hunter h, Prey p) {
-		
+		for (Wall aw : _walls) {
+			if (aw.getOrientation() == Orientation.HORIZONTAL) {
+				if ( (h.hl.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < p.pl.yloc) ) {
+					if ( (aw.rightEnd.xloc >= p.pl.xloc) && (aw.rightEnd.xloc >= h.hl.xloc) 
+						&& (aw.leftEnd.xloc <= p.pl.xloc) && (aw.leftEnd.xloc <= h.hl.xloc) ) {
+						return aw;
+					}
+				}
+				if ( (p.pl.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < h.hl.yloc) ) {
+					if ( (aw.rightEnd.xloc >= p.pl.xloc) && (aw.rightEnd.xloc >= h.hl.xloc) 
+						&& (aw.leftEnd.xloc <= p.pl.xloc) && (aw.leftEnd.xloc <= h.hl.xloc) ) {
+						return aw;
+					}
+				}				
+			}
+			if (aw.getOrientation() == Orientation.VERTICAL) {
+				if ( (h.hl.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < p.pl.xloc) ) {
+					if ( (aw.rightEnd.yloc >= p.pl.yloc) && (aw.rightEnd.yloc >= h.hl.yloc) 
+						&& (aw.leftEnd.yloc <= p.pl.yloc) && (aw.leftEnd.yloc <= h.hl.yloc) ) {
+						return aw;
+					}
+				}
+				if ( (p.pl.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < h.hl.xloc) ) {
+					if ( (aw.rightEnd.yloc >= p.pl.yloc) && (aw.rightEnd.yloc >= h.hl.yloc) 
+						&& (aw.leftEnd.yloc <= p.pl.yloc) && (aw.leftEnd.yloc <= h.hl.yloc) ) {
+						return aw;
+					}
+				}
+			}
+		}
 		return null;
 	}
 	
 	//@TODO
 	public boolean wallExistsBetween(Location a, Location b) {
+		for (Wall aw : _walls) {
+			if (aw.getOrientation() == Orientation.HORIZONTAL) {
+				if ( (a.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < b.yloc) ) {
+					if ( (aw.rightEnd.xloc >= a.xloc) && (aw.rightEnd.xloc >= b.xloc) 
+						&& (aw.leftEnd.xloc <= a.xloc) && (aw.leftEnd.xloc <= b.xloc) ) {
+						return true;
+					}
+				}
+				if ( (b.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < a.yloc) ) {
+					if ( (aw.rightEnd.xloc >= a.xloc) && (aw.rightEnd.xloc >= b.xloc) 
+						&& (aw.leftEnd.xloc <= a.xloc) && (aw.leftEnd.xloc <= b.xloc) ) {
+						return true;
+					}
+				}				
+			}
+			if (aw.getOrientation() == Orientation.VERTICAL) {
+				if ( (a.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < b.xloc) ) {
+					if ( (aw.rightEnd.yloc >= a.yloc) && (aw.rightEnd.yloc >= b.yloc) 
+						&& (aw.leftEnd.yloc <= a.yloc) && (aw.leftEnd.yloc <= b.yloc) ) {
+						return true;
+					}
+				}
+				if ( (b.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < a.xloc) ) {
+					if ( (aw.rightEnd.yloc >= a.yloc) && (aw.rightEnd.yloc >= b.yloc) 
+						&& (aw.leftEnd.yloc <= a.yloc) && (aw.leftEnd.yloc <= b.yloc) ) {
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 	
 	public boolean hunterCaughtPrey() {
-		double distsq = getDistanceSq(h.hl, p.pl);
-		if ( (distsq < SQ_CAPTURE_DIST) && !wallExistsBetween(h.hl, p.pl) ) {
+		double distsq = getDistanceSq(_hunter.hl, _prey.pl);
+		if ( (distsq < SQ_CAPTURE_DIST) && !wallExistsBetween(_hunter.hl, _prey.pl) ) {
 			return true;
 		}
 		return false;
