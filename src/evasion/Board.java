@@ -25,6 +25,8 @@ public class Board {
 	public Prey _prey;
 	public List<Wall> _walls;
 	
+	public int time = 0;
+	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
 		_hunter = new Hunter();

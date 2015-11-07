@@ -27,6 +27,7 @@ public class PreyApp {
 				   		  hunterEndpoint = "ws://localhost:1991",
 				   		  preyEndpoint = "ws://localhost:1992";
 	    
+	//static Session session;
     public static void main( String[] args )
     {        
         try {
@@ -40,25 +41,28 @@ public class PreyApp {
 
 				@Override
 				public void onOpen(Session session, EndpointConfig arg1) {
-					try {
-                        session.addMessageHandler(new MessageHandler.Whole<String>() {
-                            public void onMessage(String message) {
-                                System.out.println("Received message: "+message);
-                                messageLatch.countDown();
-                            }
-                        });
-                        for (;;) {
-                            SENT_MESSAGE = getPositionsCommand();
-                            session.getBasicRemote().sendText(SENT_MESSAGE);
-                            SENT_MESSAGE = getWallsCommand();
-                            session.getBasicRemote().sendText(SENT_MESSAGE);                        	
-                            session.getBasicRemote().sendText(makeARandomMove());
-                        	
-                        }
-                        
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+					session.addMessageHandler(new MessageHandler.Whole<String>() {
+					    public void onMessage(String message) {
+					        System.out.println("Received message: "+message);
+					        messageLatch.countDown();
+					        
+					        try {
+					            SENT_MESSAGE = getWallsCommand();
+								session.getBasicRemote().sendText(SENT_MESSAGE);
+						        SENT_MESSAGE = getPositionsCommand();
+					            session.getBasicRemote().sendText(SENT_MESSAGE);                        	
+					            session.getBasicRemote().sendText(makeARandomMove());
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}					    	
+					    }
+//			            SENT_MESSAGE = getWallsCommand();
+//						session.getBasicRemote().sendText(SENT_MESSAGE);
+//				        SENT_MESSAGE = getPositionsCommand();
+//			            session.getBasicRemote().sendText(SENT_MESSAGE);                        	
+//					    
+					});
 					
 				}
             };
@@ -67,6 +71,7 @@ public class PreyApp {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
     
         

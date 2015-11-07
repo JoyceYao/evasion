@@ -104,7 +104,7 @@ public class HunterMove extends Move {
     	if (buildWall == null || buildWall.leftEnd == null) {
     		return "";
     	}
-    	System.out.println("building wall command");
+    	//System.out.println("building wall command");
     	ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
 		HashMap<String, Object>hm = new HashMap<String, Object>();
@@ -164,7 +164,7 @@ public class HunterMove extends Move {
 		String action = "";
 		try {
 			action = writer.writeValueAsString(hm);
-			System.out.println("action: " + action);
+			//System.out.println("action: " + action);
 			//action = mapper.writeValueAsString(node1);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
