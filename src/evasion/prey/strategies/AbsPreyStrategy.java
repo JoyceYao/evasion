@@ -3,8 +3,6 @@ import evasion.Board;
 import evasion.prey.PreyMove;
 
 public abstract class AbsPreyStrategy {
-
-	Board b;
 	
 	public abstract PreyMove makeAMove(Board bd);
 	

@@ -82,7 +82,6 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     	if ( (mv != null) && !mv.equals("") ) {
     		sendDecision(mv);
     	}
-    	
     }
 
     private HunterMove MakeDecision() {
@@ -220,16 +219,6 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
             	return;
             }
             
-//            String wallsString = (String) jsonObject.get("wall");
-//            JSONArray walls = (JSONArray) jsonObject.get("wall");
-//            for (Object wobj : walls) {
-//            	JSONObject jobj = (JSONObject) wobj;
-//            	int idx = (int)jobj.get("id");
-//            	Location stPos = jsonArrayToLocation((JSONArray)jobj.get("position"));
-//            	int len = (int) jobj.get("length");
-//            	String dir = (String)jobj.get("direction");
-//            	addBoardWall(idx, stPos, len, dir);
-//            }
         }
 
         catch (Exception e) {
@@ -237,29 +226,6 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         }
     }
     
-//    private void clearBoardWalls() {
-//        board._walls.clear();
-//        Wall.runningWallCount = 0;
-//    }
-//    
-//    private void addBoardWall(int idx, Location stPos, int len, String dir) {
-//	// TODO Auto-generated method stub
-//    	Wall aw = new Wall();
-//    	aw.wallIndex = idx;
-//    	aw.leftEnd = stPos;
-//    	CardinalDirections cd = CardinalDirections.getCardinalFromString(dir);
-//    	switch (cd) {
-//    	case N:
-//    		break;
-//    	case S:
-//    		break;
-//    	case E:
-//    		break;
-//    	default: //W
-//    		
-//    	}
-//    }
-//
     
 	public Location jsonArrayToLocation(JSONArray coords) {
     	Location ln = new Location();
@@ -267,29 +233,4 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     	ln.yloc = Integer.parseInt(coords.get(1).toString());
     	return ln;
     }
-/**    
-    public ArrayList<Wall> parseJSONArrayWalls(JSONArray walls) {
-        ArrayList<Wall> returnWalls = new ArrayList<Wall>();
-        //Update walls count
-        if (walls != null) {
-            for (int id = 0; id < walls.size(); id++) {
-                JSONObject currentWallJsonObj = (JSONObject) walls.get(id);
-
-                long currentWallLengthL = (Long) currentWallJsonObj.get("length");
-                int currentWallLength = (int) currentWallLengthL;
-
-                JSONArray currentWallCoordinates = (JSONArray) currentWallJsonObj.get("position");
-                Point wallStart = parseJSONArrayCoordinates(currentWallCoordinates);
-
-                String currentWallDirection = (String) currentWallJsonObj.get("direction");
-                Point wallDirection = serverDirectionToPoint(currentWallDirection);
-
-                Wall tempWall = new Wall(wallDirection, wallStart, currentWallLength, id);
-                returnWalls.add(tempWall);
-            }
-        }
-
-        return returnWalls;
-    }
-*/
 }
