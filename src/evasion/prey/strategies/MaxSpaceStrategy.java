@@ -142,7 +142,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 			if(pl.yloc < locs[0].yloc){ pl.yloc = locs[0].yloc; }
 			if(pl.xloc > locs[1].xloc){ pl.xloc = locs[1].xloc; }
 			if(pl.yloc > locs[1].yloc){ pl.yloc = locs[1].yloc; }			
-			return hs.getInnerWallArea(walls, hl, pl);			
+			return hs.getInnerWallArea(walls, hl, pl);
 		}
 	}
 }
