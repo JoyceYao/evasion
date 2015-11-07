@@ -17,10 +17,10 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 	@Override
 	public PreyMove makeAMove(Board bd) {
 		
-		if(b.prevHunterMoves.size() == 0){
+		if(bd.prevHunterMoves.size() == 0){
 			return getInitailPreyMove();
 		}else{
-			return getBestDirection(bd, b._hunter.hl, b._prey.pl);
+			return getBestDirection(bd, bd._hunter.hl, bd._prey.pl);
 		}
 	
 	}

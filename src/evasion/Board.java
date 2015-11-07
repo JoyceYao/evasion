@@ -31,6 +31,8 @@ public class Board {
 	
 	public int[][] wallNo = new int[300][300];
 	
+	public int time = 0;
+	
 	//P is initially at point (230, 200) and H at position (0,0).
 	public Board() {
 		_hunter = new Hunter();
@@ -295,6 +297,34 @@ public class Board {
 			}
 		}
 		return false;
+	}
+
+	/**
+	{
+		"hunter":[10,10],
+		"hunterDir":"SE",
+		"prey":[231,196],
+		"walls":[{"position":[1,0],"length":300,"direction":"S","id":0}],
+		"time":10,
+		"gameover":false,
+		"errors":[]
+		}
+	*/
+/**
+ * {
+"hunter":[7,7],
+"hunterDir":"SE",
+"prey":[231,197],
+"walls":[{"position":[1,0],"length":300,"direction":"S","id":0}],
+"time":7,
+"gameover":false,
+"errors":[{"message":"Walls  do not exist","code":6,"reason":"These wall ids do not exist.","data":{"command":"D","wallIds":[1]}}]
+}
+ * @param message
+ */
+	public void parseMessageAndUpdate(String message) {
+		System.out.println("Parsing message" + message);
+		
 	}
 	
 	public boolean hunterCaughtPrey() {

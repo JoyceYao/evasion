@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,14 +33,21 @@ public class HunterMove extends Move {
 //	}
 	
 	public String moveToString() {
-		JSONObject obj = new JSONObject();
+		
+    	ObjectMapper mapper = new ObjectMapper();
+		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
+		HashMap<String, Object>hm = new HashMap<String, Object>();
+		hm.put("command", "M");
+		String action = "";
 		try {
-			obj.put("command", "M");
-		} catch (JSONException e) {
+			action = writer.writeValueAsString(hm);
+			System.out.println("action: " + action);
+			//action = mapper.writeValueAsString(node1);
+		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return obj.toString();
+        return action;
 	}
 
 //	public String buildWallToString() {
@@ -68,35 +74,37 @@ public class HunterMove extends Move {
 //	}
 	
 	public String tearDownWallToString() {
-		if (teardownWalls == null) {
+		if (teardownWalls == null || teardownWalls.isEmpty()) {
 			return "";
 		}
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put("command", "D");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		List<Integer> wids = new LinkedList<Integer>();
-		for (Wall aw : teardownWalls) {
-			wids.add(aw.wallIndex);
-		}
-		try {
-			obj.put("wallIndex", wids);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return obj.toString();
+
+	   	ObjectMapper mapper = new ObjectMapper();
+			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
+			HashMap<String, Object>hm = new HashMap<String, Object>();
+			hm.put("command", "D");
+			List<Integer> wids = new LinkedList<Integer>();
+			for (Wall aw : teardownWalls) {
+				wids.add(aw.wallIndex);
+			}
+			hm.put("wallIndex", wids);
+			String action = "";
+			try {
+				action = writer.writeValueAsString(hm);
+				System.out.println("action: " + action);
+				//action = mapper.writeValueAsString(node1);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        return action;
 	}
 	
 	
 	public String buildWallToString() {
-    	if (buildWall == null) {
+    	if (buildWall == null || buildWall.leftEnd == null) {
     		return "";
     	}
-    	
+    	//System.out.println("building wall command");
     	ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
 		HashMap<String, Object>hm = new HashMap<String, Object>();
@@ -156,7 +164,7 @@ public class HunterMove extends Move {
 		String action = "";
 		try {
 			action = writer.writeValueAsString(hm);
-			System.out.println("action: " + action);
+			//System.out.println("action: " + action);
 			//action = mapper.writeValueAsString(node1);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block

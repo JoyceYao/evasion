@@ -1,18 +1,20 @@
 package evasion;
 
 public class Wall {
-	public Location leftEnd;
-	public Location rightEnd;
+	public static int runningWallCount = 0;
+	public Location leftEnd = new Location();
+	public Location rightEnd = new Location();
+//	public int wallLength = 0;
+	
 	public WallOperation wop;
 	public int wallIndex;
+	
 	public Orientation getOrientation() {
 		if (leftEnd.xloc == rightEnd.xloc) {
 			return Orientation.VERTICAL;
 		}
 		return Orientation.HORIZONTAL;
 	};
-	
-	public Wall(){};
 	
 	public Wall(Location leftEnd, Location rightEnd, WallOperation wop, int wallIndex){
 		this.leftEnd = leftEnd;
@@ -28,6 +30,11 @@ public class Wall {
 		return Math.abs(leftEnd.yloc - rightEnd.yloc);
 	}
 
+	public Wall() {
+		wallIndex = runningWallCount;
+		runningWallCount++;
+	}
+	
 	public CardinalDirections getWallDirFromLocation(Location a) {
 		Orientation on = getOrientation();
 		switch (on) {
@@ -45,5 +52,16 @@ public class Wall {
 			}
 			return CardinalDirections.N;
 		}
+	}
+	
+	public boolean isSame(Wall w) {
+		if (this.leftEnd.isEqual(w.leftEnd)) {
+			if (this.rightEnd.isEqual(w.rightEnd)) {
+				if (this.wallIndex == w.wallIndex) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

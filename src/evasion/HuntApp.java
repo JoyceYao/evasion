@@ -1,213 +1,236 @@
 package evasion;
-import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import org.glassfish.tyrus.client.ClientManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import evasion.connections.GameWithPlayerSocket;
+import evasion.connections.GameWithPublisherSocket;
+import evasion.connections.PlayerWebSocket;
+import evasion.connections.PublisherWebSocket;
 import evasion.hunter.HunterMove;
 import evasion.hunter.strategies.AbsHunterStrategy;
 
-public class HuntApp {
+public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
+    JSONParser parser = new JSONParser();
+
+    WebSocketClient publClient = new WebSocketClient();
+    WebSocketClient playerClient = new WebSocketClient();
+    PublisherWebSocket publSocket = new PublisherWebSocket(this);
+    PlayerWebSocket playerSocket = new PlayerWebSocket(this);
+    boolean connectedToPlayer = false; 
+    boolean connectedToPublisher = false; 
+
+    static HuntApp Hunter;
+    //public HunterEndpoint hep;
+    public Board board;
+    public AbsHunterStrategy strategy;
 	private static CountDownLatch messageLatch;
-	
 	private static String SENT_MESSAGE = "";
 	
 	private static String publisherEndpoint = "ws://localhost:1990",
 				   		  hunterEndpoint = "ws://localhost:1991",
 				   		  preyEndpoint = "ws://localhost:1992";
-	    
-    public static void main( String[] args )
-    {        
+
+	public static void main( String[] args ) {  
+		Hunter = new HuntApp();
+		
+	}
+	
+	public HuntApp() {
+		board = new Board();
+		strategy = AbsHunterStrategy.getStrategy("R");
+		//hep = 
+        setUpConnection(hunterEndpoint, publisherEndpoint);
+	}
+	
+
+    // Receives JSon object as string
+    public void ReceivedMessageFromPlayerSocket(String message) {
+        // This will update your game
+       // parsePlayerMessage(message);
+    } 
+
+    public void ReceivedMessageFromPublisherSocket(String message) {
+        // Received publisher message
+        // Turn is over, Time to make new turn
+        parsePublisherMessage(message);
+        // USE this to decide your move
+        playerMakeMove();
+    }
+    
+    public void playerMakeMove() {
+    	//Hunter moves immediately
+        HunterMove hm = MakeDecision();
+    	String bw = hm.buildWallToString();
+    	if ( (bw != null) && !bw.equals("") ) {
+    		sendDecision(bw);
+    	}
+    	
+    	String tw = hm.tearDownWallToString();
+    	if ( (tw != null) && !tw.equals("") ) {
+    		sendDecision(tw);
+    	}
+        
+    	String mv = hm.moveToString();
+    	if ( (mv != null) && !mv.equals("") ) {
+    		sendDecision(mv);
+    	}
+    }
+
+    private HunterMove MakeDecision() {
+		// TODO Auto-generated method stub
+    	return strategy.makeAMove(board);
+	}
+
+    //org.json.simple
+	public void sendDecision(JSONObject decision) {
+        playerSocket.sendMessage(decision.toJSONString());
+    }
+
+	//org.json
+	public void sendDecision(org.json.JSONObject decision) {
+        playerSocket.sendMessage(decision.toString());
+    }
+
+	public void sendDecision(String decision) {
+        playerSocket.sendMessage(decision);
+    }
+
+
+    public void ConnectionMadeWithPlayerSocket() {
+        this.connectedToPlayer = true;
+    }
+
+    public void ConnectionMadeWithPublisherSocket() {
+        this.connectedToPublisher = true;
+        //wait for the connection to make the first HunterMove
+        Hunter.playerMakeMove();
+    }
+
+
+    public void setUpConnection(String playerDest, String publDest) {
         try {
-            messageLatch = new CountDownLatch(1);
+            publClient.start();
+            playerClient.start();
+            URI publURI = new URI(publDest);
+            URI playerURI = new URI(playerDest);
+            ClientUpgradeRequest publRequest = new ClientUpgradeRequest();
+            ClientUpgradeRequest playerRequest = new ClientUpgradeRequest();
+            publClient.connect(publSocket, publURI, publRequest);
+            playerClient.connect(playerSocket, playerURI, playerRequest);
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
-            final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
+/**
+    public synchronized void parsePlayerMessage(String message) {
+        System.out.println(message);
+        try {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                Object obj = parser.parse(message);
+                jsonObject = (JSONObject) obj;
+            }
 
-            ClientManager client = ClientManager.createClient();
-            Board board = new Board();
-            AbsHunterStrategy hstrategy = AbsHunterStrategy.getStrategy("W");
-            Endpoint hunter = new Endpoint() {
+            catch (ParseException pe) {
+                System.out.println(pe);
+            }
 
-				@Override
-				public void onOpen(Session session, EndpointConfig arg1) {
-					try {
-                        session.addMessageHandler(new MessageHandler.Whole<String>() {
-                            public void onMessage(String message) {
-                                System.out.println("Received message: "+message);
-                                messageLatch.countDown();
-                            }
-                        });
-                        for(;;) {
-                        	makeAMove(board, hstrategy, session);
-                        	//session.getBasicRemote().sendText(makeARandomMove());
-                            //SENT_MESSAGE = getPositionsCommand();
-                            //session.getBasicRemote().sendText(SENT_MESSAGE);
-                            //SENT_MESSAGE = getWallsCommand();
-                            //session.getBasicRemote().sendText(SENT_MESSAGE);
-                        	
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-					
-				}
-            };
-            client.connectToServer(hunter, cec, new URI(hunterEndpoint));
-            messageLatch.await(100, TimeUnit.SECONDS);
-        } catch (Exception e) {
+            String commandValue = (String) jsonObject.get("command");
+
+            if (commandValue.equals("W")) {
+                JSONArray walls = (JSONArray) jsonObject.get("walls");
+                ArrayList<Wall> readInWalls = parseJSONArrayWalls(walls);
+
+                updateWalls(readInWalls);
+            }
+
+            else if (commandValue.equals("P")) {
+                JSONArray hunterCoordinates = (JSONArray) jsonObject.get("hunter");
+                Point hunterPoint = parseJSONArrayCoordinates(hunterCoordinates);
+
+                JSONArray preyCoordinates = (JSONArray) jsonObject.get("prey");
+                Point preyPoint = parseJSONArrayCoordinates(preyCoordinates);
+
+                updatePositions(hunterPoint, preyPoint);
+            }
+
+            else {
+            }
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
+**/
     
-        
-    public static String getPositionsCommand() {
-    	return runCommand("P");
-    }
-    
-    public static String getWallsCommand() {
-    	return runCommand("W");
-    }
-    
-    public static String runCommand(String command) {
-    	String action = "";
-    	ObjectMapper mapper = new ObjectMapper();
-    	ObjectNode node = mapper.createObjectNode();
-        node.put("command", command); 
+
+    public synchronized void parsePublisherMessage(String message) {
+        message.replace("false", "\"false\"");
+        message.replace("true", "\"true\"");
         try {
-			action = mapper.writeValueAsString(node);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return action;
-    }
+            JSONObject jsonObject = new JSONObject();
+            try {
+                Object obj = parser.parse(message);
+                jsonObject = (JSONObject) obj;
+            }
 
-    public static void makeAMove(Board b, AbsHunterStrategy s, Session sn) throws IOException {
-    	HunterMove hm = s.makeAMove(b);
-    	ObjectMapper mapper = new ObjectMapper();
-    	
-    	System.out.println("makeAMove[0] hm=" + hm);
-    	System.out.println("makeAMove[0] hm.buildWall=" + hm.buildWall);
-    	System.out.println("makeAMove[0] hm.teardown=" + hm.teardownWalls);
-    	
-		ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-		String action = "";
-		try {
-			action = writer.writeValueAsString(hm.moveToString());
-			System.out.println("action: " + action);
-			//action = mapper.writeValueAsString(node1);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if(hm.buildWallToString() != ""){ sn.getBasicRemote().sendText(hm.buildWallToString()); }//Build wall 
-		sn.getBasicRemote().sendText(hm.moveToString());//Move
-		if(hm.tearDownWallToString() != ""){ sn.getBasicRemote().sendText(hm.tearDownWallToString()); }//Delete wall
+            catch (ParseException pe) {
+                System.out.println(pe);
+            }
+
+            JSONArray hunterCoordinates = (JSONArray) jsonObject.get("hunter");
+            //Point hunterPoint = parseJSONArrayCoordinates(hunterCoordinates);
+            System.out.println(hunterCoordinates);
+            board._hunter.hl.xloc = Integer.parseInt(hunterCoordinates.get(0).toString());
+            board._hunter.hl.yloc = Integer.parseInt(hunterCoordinates.get(1).toString());
+            System.out.println("hx: " + board._hunter.hl.xloc);
+
+            
+            JSONArray preyCoordinates = (JSONArray) jsonObject.get("prey");
+            //Point preyPoint = parseJSONArrayCoordinates(preyCoordinates);
+            System.out.println(preyCoordinates);
+            board._prey.pl.xloc = Integer.parseInt(preyCoordinates.get(0).toString());
+            board._prey.pl.yloc = Integer.parseInt(preyCoordinates.get(1).toString());
+
+            System.out.println("px: " + board._prey.pl.xloc);
+            
+            String huntDirection = (String) jsonObject.get("hunterDir");
+            board._hunter.hunterDirection = CardinalDirections.getCardinalFromString(huntDirection);
+            
+            //Point hunterDir = serverDirectionToPoint(huntDirection);
+
+
+            long timeL = (Long) jsonObject.get("time");
+            board.time = (int) timeL;
+
+            boolean gameOver = (Boolean) jsonObject.get("gameover");
+            if (gameOver) {
+            	System.out.println("No way, Hannan!!!");
+            	return;
+            }
+            
+        }
+
+        catch (Exception e) {
+            System.out.println(e);
+        }
     }
     
-    public static String makeARandomMove() {
-    	String action = "";
-    	ObjectMapper mapper = new ObjectMapper();
-        Random rand = new Random();
-		int randomNum = rand.nextInt(3); //0--B, 1--M, 2--D
-
-		//B {
-//		  "wall" : {
-//		    "length" : "200",
-//		    "direction" : "W"
-//		  },
-//		  "command" : "B"
-//		}
-		if (randomNum == 0) {
-			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-			
-			HashMap<String, Object> hm = new HashMap<String, Object>();
-	    	HashMap<String, String>wall = new HashMap<String, String>();
-	    	int wLen = rand.nextInt(300) + 1;
-			randomNum = rand.nextInt(4);
-			String dir = new String();//
-			switch (randomNum) {
-				case 0: dir = "N"; break;//NE
-				case 1: dir = "E"; break;//SE
-				case 2: dir = "S"; break;//SW
-				case 3: dir = "W"; break;//NW
-				default: dir = "E"; break;//SE
-			}
-			wall.put("length", "" + wLen);
-			wall.put("direction", dir);
-			hm.put("command", "B");
-			hm.put("wall", wall);
-			try {
-				action = writer.writeValueAsString(hm);
-				System.out.println("action: " + action);
-				//action = mapper.writeValueAsString(node1);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        return action;
-		}
-
-    	//M {command: "M", direction: "SE"}
-//		if (randomNum == 1) {
-			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-   	    	//ObjectNode node2 = mapper.createObjectNode();
-			HashMap<String, String> hm = new HashMap();
-	        hm.put("command", "M"); 
-//	        String dir = new String();
-//			randomNum = rand.nextInt(9); //
-//			
-//			switch (randomNum) {
-//				case 0: dir = "NE"; break;//NE
-//				case 1: dir = "SE"; break;//SE
-//				case 2: dir = "SW"; break;//SW
-//				case 3: dir = "NW"; break;//NW
-//				default: dir = "SE"; break;//SE
-//			}
-//			hm.put("direction", dir);
-			try {
-				action = writer.writeValueAsString(hm);
-				System.out.println("action: " + action);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        return action;
-//		}  
-		/**
-		else {//D {command: "D", index: 2} // delete wall at index 2
-			ObjectWriter writer=mapper.writerWithDefaultPrettyPrinter();
-   	    	//ObjectNode node2 = mapper.createObjectNode();
-			HashMap<String, String> hm = new HashMap();
-	        hm.put("command", "D"); 
-	        randomNum = rand.nextInt(5); // delete a random wall
-	        hm.put("index", ""+randomNum);
-			try {
-				action = writer.writeValueAsString(hm);
-				System.out.println("action: " + action);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        return action;	        
-		}
-		*/
-		
+    
+	public Location jsonArrayToLocation(JSONArray coords) {
+    	Location ln = new Location();
+    	ln.xloc = Integer.parseInt(coords.get(0).toString());
+    	ln.yloc = Integer.parseInt(coords.get(1).toString());
+    	return ln;
     }
-
 }
