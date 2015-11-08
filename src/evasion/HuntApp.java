@@ -219,6 +219,8 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
             	return;
             }
             
+            updateWalls((JSONArray)jsonObject.get("walls"));
+
         }
 
         catch (Exception e) {
@@ -233,4 +235,51 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     	ln.yloc = Integer.parseInt(coords.get(1).toString());
     	return ln;
     }
+	
+
+    private void updateWalls(JSONArray walls) {
+        clearBoardWalls();
+        for (Object wobj : walls) {
+        	JSONObject jobj = (JSONObject) wobj;
+        	long idxL = (Long)jobj.get("id");
+        	int idx = (int) idxL;
+        	Location stPos = jsonArrayToLocation((JSONArray)jobj.get("position"));
+        	long lenL = (Long) jobj.get("length");
+        	int len = (int) lenL;
+        	String dir = (String)jobj.get("direction");
+        	addWallToBoard(idx, stPos, len, dir);
+        }
+    }
+    
+    private void clearBoardWalls() {
+        board._walls.clear();
+        Wall.runningWallCount = 0;
+    }
+//    
+    private void addWallToBoard(int idx, Location stPos, int len, String dir) {
+	// TODO Auto-generated method stub
+    	Wall aw = new Wall();
+    	aw.wallIndex = idx;
+    	Location vertex1 = stPos;
+    	Location vertex2 = new Location();
+    	//aw.leftEnd = stPos;
+    	CardinalDirections cd = CardinalDirections.getCardinalFromString(dir);
+    	switch (cd) {
+    	case N:
+    		vertex2.xloc = vertex1.xloc; vertex2.yloc = vertex1.yloc - len;
+    		break;
+    	case S:
+    		vertex2.xloc = vertex1.xloc; vertex2.yloc = vertex1.yloc + len;
+    		break;
+    	case E:
+    		vertex2.xloc = vertex1.xloc+len; vertex2.yloc = vertex1.yloc;
+    		break;
+    	default: //W
+    		vertex2.xloc = vertex1.xloc-len; vertex2.yloc = vertex1.yloc;
+    		break;
+    	}
+		aw.leftEnd = vertex1; aw.rightEnd = vertex2;
+		board._walls.add(aw);
+    }
+
 }
