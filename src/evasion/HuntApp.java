@@ -45,7 +45,7 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public HuntApp() {
 		board = new Board();
-		strategy = AbsHunterStrategy.getStrategy("W");
+		strategy = AbsHunterStrategy.getStrategy("R");
 		//hep = 
         setUpConnection(hunterEndpoint, publisherEndpoint);
 	}
@@ -69,17 +69,17 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     	//Hunter moves immediately
         HunterMove hm = MakeDecision();
     	String bw = hm.buildWallToString();
-    	if ( (bw != null) && !bw.equals("") ) {
+    	if ( (bw != null) && !bw.trim().equals("") ) {
     		sendDecision(bw);
     	}
     	
     	String tw = hm.tearDownWallToString();
-    	if ( (tw != null) && !tw.equals("") ) {
+    	if ( (tw != null) && !tw.trim().equals("") ) {
     		sendDecision(tw);
     	}
         
     	String mv = hm.moveToString();
-    	if ( (mv != null) && !mv.equals("") ) {
+    	if ( (mv != null) && !mv.trim().equals("") ) {
     		sendDecision(mv);
     	}
     }
