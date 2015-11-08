@@ -51,7 +51,16 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			//if (b.wallExistsBetween(b._hunter.hl, new Location(nextX, nextY))){
 			Wall newWall = null;
 			
-			if(lastCreateWallTime + b.N < currSteps ){ newWall = getWall(b, prevMove, b._prey); }
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] lastCreateWallTime + b.N=" + (lastCreateWallTime + b.N));
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] currSteps" + currSteps);
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] prevMove.fromX" + prevMove.fromX);
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] b._prey.pl.xloc" + b._prey.pl.xloc);
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] prevMove.fromY" + prevMove.fromY);
+			System.out.println("MinSpaceStrategy makeAMove[2-0-1] b._prey.pl.yloc" + b._prey.pl.yloc);			
+			if(lastCreateWallTime <= 0 || lastCreateWallTime + b.N < currSteps && 
+					(Math.abs(prevMove.fromX-b._prey.pl.xloc) == 3 || Math.abs(prevMove.fromX-b._prey.pl.xloc) == 3)){ 
+				newWall = getWall(b, prevMove, b._prey); 
+			}
 			
 			System.out.println("MinSpaceStrategy makeAMove[2-0] newWall=" + newWall);
 			
@@ -137,21 +146,53 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	
 	private Wall getWall(Board b, HunterMove prevHM,  Prey p){
 		System.out.println("MinSpaceStrategy getWall[0]");
-		if(Math.abs(prevHM.fromX-p.pl.xloc) < 2 || Math.abs(prevHM.fromY-p.pl.yloc) < 2){
+		System.out.println("MinSpaceStrategy getWall[1] prevHM.fromX=" + prevHM.fromX);
+		System.out.println("MinSpaceStrategy getWall[1] p.pl.xloc=" + p.pl.xloc);
+		System.out.println("MinSpaceStrategy getWall[1] prevHM.fromY=" + prevHM.fromY);
+		System.out.println("MinSpaceStrategy getWall[1] p.pl.yloc=" + p.pl.yloc);
+		if(Math.abs(prevHM.fromX-p.pl.xloc) == 3){
 			//get smallest enclosing wall
+			Location hloc = new Location(prevHM.fromX, prevHM.fromY);
+			Wall thisWall = getSmallestEnclosingWall(b._walls, hloc, prevHM.deltaX, prevHM.deltaY, p.pl);
+			int timeInterval = (p.pl.yloc-prevHM.fromY)*2/3;
+			int meetY = prevHM.fromY+prevHM.deltaY*timeInterval; //hunter move twice faster than prey
+			int meetX = getFutureXLoc(hloc, prevHM.deltaX, b._walls, timeInterval);
+			Wall nextWall = getSmallestEnclosingWall(b._walls, new Location(meetX, meetY), prevHM.deltaX, prevHM.deltaY, p.pl);
 			
-			System.out.println("MinSpaceStrategy getWall[1] prevHM.fromX=" + prevHM.fromX);
-			System.out.println("MinSpaceStrategy getWall[1] p.pl.xloc=" + p.pl.xloc);
-			System.out.println("MinSpaceStrategy getWall[1] prevHM.fromY=" + prevHM.fromY);
-			System.out.println("MinSpaceStrategy getWall[1] p.pl.yloc=" + p.pl.yloc);
-			return getSmallestEnclosingWall(b._walls, new Location(prevHM.fromX, prevHM.fromY), new Location(prevHM.fromX+prevHM.deltaX, prevHM.fromY+prevHM.deltaY), p.pl);
+			System.out.println("MinSpaceStrategy getWall[2] thisWall.enclosingArea=" + thisWall.enclosingArea);
+			System.out.println("MinSpaceStrategy getWall[2] nextWall.enclosingArea=" + nextWall.enclosingArea);
+			 
+			if(thisWall.enclosingArea < nextWall.enclosingArea){
+				return thisWall;
+			}else{
+				return nextWall;
+			}
+			
+		} else if (Math.abs(prevHM.fromY-p.pl.yloc) == 3){
+			//get smallest enclosing wall
+			Location hloc = new Location(prevHM.fromX, prevHM.fromY);
+			Wall thisWall = getSmallestEnclosingWall(b._walls, hloc, prevHM.deltaX, prevHM.deltaY, p.pl);
+			int timeInterval = (p.pl.xloc-prevHM.fromX)*2/3;
+			int meetX = prevHM.fromX+prevHM.deltaX*timeInterval;
+			int meetY = getFutureYLoc(new Location(prevHM.fromX, prevHM.fromY), prevHM.deltaY, b._walls, timeInterval);
+			Wall nextWall = getSmallestEnclosingWall(b._walls, new Location(meetX, meetY), prevHM.deltaX, prevHM.deltaY, p.pl);
+			
+			System.out.println("MinSpaceStrategy getWall[3] thisWall.enclosingArea=" + thisWall.enclosingArea);
+			System.out.println("MinSpaceStrategy getWall[3] nextWall.enclosingArea=" + nextWall.enclosingArea);
+			
+			if(thisWall.enclosingArea < nextWall.enclosingArea){
+				return thisWall;
+			}else{
+				return nextWall;
+			}
+			
 		} else {
-			System.out.println("MinSpaceStrategy getWall[2]");
+			System.out.println("MinSpaceStrategy getWall[4]");
 			return null;
 		}
 	}
 	
-	private Wall getSmallestEnclosingWall(List<Wall> walls, Location hl, Location hl2, Location pl){
+	private Wall getSmallestEnclosingWall(List<Wall> walls, Location hl, int deltaX, int deltaY, Location pl){
 		// get enclosing space before building new wall
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[0]");
 		
@@ -184,11 +225,12 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[2]");
 		
 		int hWallArea = 0;
-		if(hl2.yloc < hl.yloc){ //S wall
+		if(hl.yloc > pl.yloc){ //S wall
 			hWallArea = (maxX-minX)*(hl.yloc-minY);
 		}else{ // N wall
 			hWallArea = (maxX-minX)*(maxY-hl.yloc);
 		}
+		hWall.enclosingArea = hWallArea;
 		
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[3]");
 		
@@ -199,11 +241,12 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[4]");
 		
 		int vWallArea = 0;
-		if(hl2.xloc < hl.xloc){  // W wall
+		if(hl.xloc < pl.xloc){  // W wall
 			vWallArea = (maxX-hl.xloc)*(maxY-minY);
 		}else{ // E wall
 			vWallArea = (hl.xloc-minX)*(maxY-minY);
 		}
+		vWall.enclosingArea = vWallArea;
 		
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[5]");
 		
@@ -325,4 +368,25 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		}
 		return false;
 	}
+	
+	private int getFutureXLoc(Location h, int deltaX, List<Wall> walls, int timeInterval){
+		if(deltaX == 0){ return h.xloc; }
+		int eastIdx = getEWallIdx(walls, h.xloc);
+		int westIdx = getWWallIdx(walls, h.xloc);
+		int eastX = eastIdx == -1? 299 : walls.get(eastIdx).leftEnd.xloc;
+		int westX = westIdx == -1? 0 : walls.get(westIdx).leftEnd.xloc;
+		int newInterval = timeInterval%(eastX-westX);
+		return h.xloc+newInterval*deltaX;
+	}
+	
+	private int getFutureYLoc(Location h, int deltaY, List<Wall> walls, int timeInterval){
+		if(deltaY == 0){ return h.yloc; }
+		int northIdx = getNWallIdx(walls, h.yloc);
+		int southIdx = getSWallIdx(walls, h.yloc);
+		int northX = northIdx == -1? 0 : walls.get(northIdx).leftEnd.xloc;
+		int southX = southIdx == -1? 299 : walls.get(southIdx).leftEnd.xloc;
+		int newInterval = timeInterval%(southX-northX);
+		return h.yloc+newInterval*deltaY;
+	}
+
 }

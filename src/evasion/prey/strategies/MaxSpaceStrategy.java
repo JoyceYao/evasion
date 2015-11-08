@@ -3,6 +3,7 @@ package evasion.prey.strategies;
 import java.util.List;
 
 import evasion.Board;
+import evasion.CardinalDirections;
 import evasion.Location;
 import evasion.Move;
 import evasion.Wall;
@@ -14,15 +15,25 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 
 	MinSpaceStrategy hs = new MinSpaceStrategy();
 	
+	public MaxSpaceStrategy(){
+		System.out.println("using MaxSpaceStrategy!!!");
+	}
+	
 	@Override
 	public PreyMove makeAMove(Board bd) {
+		System.out.println("makeAMove[0]");
+		PreyMove pm = new PreyMove();
 		
-		if(bd.prevHunterMoves.size() == 0){
-			return getInitailPreyMove();
+		if(bd._hunter.hunterDirection == null){
+			System.out.println("makeAMove[1]");
+			pm = getInitailPreyMove();
 		}else{
-			return getBestDirection(bd, bd._hunter.hl, bd._prey.pl);
+			System.out.println("makeAMove[2]");
+			pm = getBestDirection(bd, bd._hunter.hl, bd._prey.pl);
 		}
-	
+		
+		pm = bd.addPreyMove(pm);
+		return pm;
 	}
 	
 	private PreyMove getInitailPreyMove(){
@@ -40,7 +51,10 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		int thisFromX = pl.xloc;
 		int thisFromY = pl.yloc;
 
-		Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
+		//Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
+		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection);
+		
+		System.out.println("getBestDirection[0] hm=" + hm.toString());
 		
 		int bestDeltaX = 0;
 		int bestDeltaY = 0;
@@ -49,12 +63,18 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		// if the hunter going towards to the prey
 		int distBefore = Math.abs(hl.xloc-pl.xloc) + Math.abs(hl.yloc-pl.yloc);
 		int distAfter = Math.abs(hl.xloc+hm.deltaX-pl.xloc) + Math.abs(hl.yloc+hm.deltaY-pl.yloc);
+		
+		System.out.println("getBestDirection[1] distBefore=" + distBefore);
+		System.out.println("getBestDirection[2] distAfter=" + distAfter);
+		
 		if(distAfter < distBefore){
 			// find a direction to make largest space
 			for(int i=-1; i<=1; i++){
 				for(int j=-1; j<=1; j++){
 					if(b.testWillBeCaught(hl, pl)){ continue; }
 					int thisSpace = getWallSpace(b._walls, hl, pl, hm, i, j);
+					System.out.println("getBestDirection[2-1] maxWallSpace=" + maxWallSpace);
+					System.out.println("getBestDirection[2-2] thisSpace=" + thisSpace);
 					if(maxWallSpace < thisSpace){
 						bestDeltaX = i;
 						bestDeltaY = j;
@@ -68,6 +88,10 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 			m.fromX = thisFromX;
 			m.fromY = thisFromY;
 			
+			System.out.println("getBestDirection[3] bestDeltaX=" + bestDeltaX);
+			System.out.println("getBestDirection[4] bestDeltaY=" + bestDeltaY);
+
+			
 		} else {
 			m.fromX = thisFromX;
 			m.fromY = thisFromY;
@@ -79,6 +103,9 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 
 	private int getWallSpace(List<Wall> walls, Location hl, Location pl, Move hm, int deltaX, int deltaY){
 		// x is approaching
+		
+		System.out.println("getWallSpace[0]");
+		
 		int xMeetTime = 0;
 		int meetX = -1;
 		int diffX = Math.abs(hl.xloc-pl.xloc);
@@ -114,6 +141,9 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		}else{
 			yMeetTime = Integer.MAX_VALUE;
 		}
+		
+		System.out.println("getWallSpace[1] xMeetTime=" + xMeetTime);
+		System.out.println("getWallSpace[2] yMeetTime=" + yMeetTime);
 		
 		if(xMeetTime == Integer.MAX_VALUE && yMeetTime == Integer.MAX_VALUE){
 			return -1;

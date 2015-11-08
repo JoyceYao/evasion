@@ -8,6 +8,7 @@ public class Wall {
 	
 	public WallOperation wop;
 	public int wallIndex;
+	public int enclosingArea = 0;
 	
 	public Orientation getOrientation() {
 		if (leftEnd.xloc == rightEnd.xloc) {

@@ -90,7 +90,7 @@ public class Board {
 		}
 	}
 	
-	public void addPreyMove(PreyMove pm) {
+	public PreyMove addPreyMove(PreyMove pm) {
 		PreyMove epm = getEffectivePreyMove(pm);
 		_prey.pl.xloc += epm.deltaX;
 		_prey.pl.yloc += epm.deltaY;
@@ -105,7 +105,7 @@ public class Board {
 				_prey.preyDirection = CardinalDirections.getReflectedDirFromOriginalDirAndFinalDelta(origDir, epm.deltaX, epm.deltaY);
 			}
 		}
-		
+		return epm;
 	}
 	
 	//calculate move after bounces

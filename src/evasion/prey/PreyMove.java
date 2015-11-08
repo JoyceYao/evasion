@@ -8,7 +8,7 @@ public class PreyMove extends Move {
 	public String toString() {
 		JSONObject obj = new JSONObject();
 		try {
-			obj.put("Command", "M");
+			obj.put("command", "M");
 			CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
 			if (d == CardinalDirections.NOMOVE) {
 			
