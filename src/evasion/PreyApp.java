@@ -279,6 +279,7 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     		break;
     	}
 		aw.leftEnd = vertex1; aw.rightEnd = vertex2;
+		board._walls.add(aw);
     }
 //
     
