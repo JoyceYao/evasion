@@ -20,17 +20,6 @@ public class HunterMove extends Move {
 	public Wall buildWall;
 	public List<Wall> teardownWalls;
 	
-//	public String toString() {
-//		JSONObject obj = new JSONObject();
-//		obj.put("Command", "M");
-//		CardinalDirections d = CardinalDirections.getDirectionFromMove(this);
-//		if (d == CardinalDirections.NOMOVE) {
-//			
-//		} else {
-//			obj.put("direction", d);
-//		}
-//		return obj.toString();
-//	}
 	
 	public String moveToString() {
 		
@@ -50,28 +39,7 @@ public class HunterMove extends Move {
         return action;
 	}
 
-//	public String buildWallToString() {
-//		if (buildWall == null) {
-//			return "";
-//		}
-//		JSONObject obj = new JSONObject();
-//		obj.put("Command", "B");
-//		
-//		JSONObject wallObj = new JSONObject();
-//		wallObj.put("leftx", buildWall.leftEnd.xloc);
-//		wallObj.put("lefty", buildWall.leftEnd.yloc);
-//		wallObj.put("rightx", buildWall.rightEnd.xloc);
-//		wallObj.put("righty", buildWall.rightEnd.yloc);
-//	
-//		CardinalDirections d = CardinalDirections.getDirectionOfWall(buildWall, this);
-//		if (d == CardinalDirections.NOMOVE) {
-//			
-//		} else {
-//			wallObj.put("direction", d);
-//		}
-//		obj.put("wall", wallObj);
-//		return obj.toString();
-//	}
+
 	
 	public String tearDownWallToString() {
 		if (teardownWalls == null || teardownWalls.isEmpty()) {
