@@ -43,7 +43,7 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public PreyApp() {
 		board = new Board();
-		strategy = AbsPreyStrategy.getStrategy("W");
+		strategy = AbsPreyStrategy.getStrategy("F");
         setUpConnection(preyEndpoint, publisherEndpoint);
 	}
 	
@@ -279,6 +279,7 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     		break;
     	}
 		aw.leftEnd = vertex1; aw.rightEnd = vertex2;
+		board._walls.add(aw);
     }
 //
     

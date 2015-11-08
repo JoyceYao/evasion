@@ -192,7 +192,7 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		}
 	}
 	
-	private Wall getSmallestEnclosingWall(List<Wall> walls, Location hl, int deltaX, int deltaY, Location pl){
+	public Wall getSmallestEnclosingWall(List<Wall> walls, Location hl, int deltaX, int deltaY, Location pl){
 		// get enclosing space before building new wall
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[0]");
 		
@@ -339,6 +339,7 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	}
 	
 	public Location[] getMinMaxXY(List<Wall> walls, Location hl, Location pl){
+		System.out.println("getMinMaxXY walls.size= " + walls.size());
 		int WWallIdx = getWWallIdx(walls, Math.max(hl.xloc, pl.xloc));
 		int EWallIdx = getEWallIdx(walls, Math.min(hl.xloc, pl.xloc));
 		int NWallIdx = getNWallIdx(walls, Math.min(hl.yloc, pl.yloc));
@@ -369,22 +370,26 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		return false;
 	}
 	
-	private int getFutureXLoc(Location h, int deltaX, List<Wall> walls, int timeInterval){
+	public int getFutureXLoc(Location h, int deltaX, List<Wall> walls, int timeInterval){
 		if(deltaX == 0){ return h.xloc; }
 		int eastIdx = getEWallIdx(walls, h.xloc);
 		int westIdx = getWWallIdx(walls, h.xloc);
 		int eastX = eastIdx == -1? 299 : walls.get(eastIdx).leftEnd.xloc;
 		int westX = westIdx == -1? 0 : walls.get(westIdx).leftEnd.xloc;
+		System.out.println("getFutureXLoc eastX=" + eastX);
+		System.out.println("getFutureXLoc westX=" + westX);
 		int newInterval = timeInterval%(eastX-westX);
 		return h.xloc+newInterval*deltaX;
 	}
 	
-	private int getFutureYLoc(Location h, int deltaY, List<Wall> walls, int timeInterval){
+	public int getFutureYLoc(Location h, int deltaY, List<Wall> walls, int timeInterval){
 		if(deltaY == 0){ return h.yloc; }
 		int northIdx = getNWallIdx(walls, h.yloc);
 		int southIdx = getSWallIdx(walls, h.yloc);
-		int northX = northIdx == -1? 0 : walls.get(northIdx).leftEnd.xloc;
-		int southX = southIdx == -1? 299 : walls.get(southIdx).leftEnd.xloc;
+		int northX = northIdx == -1? 0 : walls.get(northIdx).leftEnd.yloc;
+		int southX = southIdx == -1? 299 : walls.get(southIdx).leftEnd.yloc;
+		System.out.println("getFutureYLoc northX=" + northX);
+		System.out.println("getFutureYLoc southX=" + southX);
 		int newInterval = timeInterval%(southX-northX);
 		return h.yloc+newInterval*deltaY;
 	}

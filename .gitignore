@@ -1,1 +1,8 @@
 /bin/
+.project
+evasionServer.jar
+hunter.jar
+runHunter.cmd
+runHunter.sh
+runPrey.cmd
+runPrey.sh
