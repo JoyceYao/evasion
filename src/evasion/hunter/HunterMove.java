@@ -43,7 +43,7 @@ public class HunterMove extends Move {
 	
 	public String tearDownWallToString() {
 		if (teardownWalls == null || teardownWalls.isEmpty()) {
-			return "";
+			return null;
 		}
 
 	   	ObjectMapper mapper = new ObjectMapper();
@@ -70,7 +70,7 @@ public class HunterMove extends Move {
 	
 	public String buildWallToString() {
     	if (buildWall == null || buildWall.leftEnd == null) {
-    		return "";
+    		return null;
     	}
     	//System.out.println("building wall command");
     	ObjectMapper mapper = new ObjectMapper();
