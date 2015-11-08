@@ -214,6 +214,25 @@ public enum CardinalDirections {
 			default: return CardinalDirections.NOMOVE;
 		}
 	}
+	
+	public static Move getMoveFromCardinalDirections(Location loc, CardinalDirections cd){
+		if(loc == null){ return null; }
+		Move m = new Move();
+		m.fromX = loc.xloc;
+		m.fromY = loc.yloc;
+		switch(cd) {
+			case N: m.deltaX=0; m.deltaY=-1; break;
+			case S: m.deltaX=0; m.deltaY=1; break;
+			case E: m.deltaX=1; m.deltaY=0; break;// [1,0],
+			case W: m.deltaX=-1; m.deltaY=0; break;// [-1,0],
+			case NE: m.deltaX=1; m.deltaY=-1; break;// [1,-1],
+			case NW: m.deltaX=-1; m.deltaY=-1; break;// [-1,-1],
+			case SE: m.deltaX=1; m.deltaY=1; break;// [1,1],
+			case SW: m.deltaX=-1; m.deltaY=1; break; //: [-1,1]
+			case NOMOVE: m.deltaX=0; m.deltaY=0; break; //[0,0]
+		}
+		return m;
+	}
 }
 		
 

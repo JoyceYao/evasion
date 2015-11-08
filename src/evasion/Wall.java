@@ -8,6 +8,7 @@ public class Wall {
 	
 	public WallOperation wop;
 	public int wallIndex;
+	public int enclosingArea = 0;
 	
 	public Orientation getOrientation() {
 		if (leftEnd.xloc == rightEnd.xloc) {
@@ -16,6 +17,13 @@ public class Wall {
 		return Orientation.HORIZONTAL;
 	};
 	
+	public Wall(Location leftEnd, Location rightEnd, WallOperation wop, int wallIndex){
+		this.leftEnd = leftEnd;
+		this.rightEnd = rightEnd;
+		this.wop = wop;
+		this.wallIndex = wallIndex;
+	}
+		
 	public int getLength() {
 		if (getOrientation() == Orientation.HORIZONTAL) {
 			return Math.abs(leftEnd.xloc - rightEnd.xloc);
