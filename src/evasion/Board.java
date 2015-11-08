@@ -17,13 +17,19 @@ public class Board {
 	public static int PREY_INIT_X = 230;
 	public static int PREY_INIT_Y = 200;
 	
-	public int N;//walls cannot be built more frequently than N steps 
-	public int M;//max walls
+	public int N = 100;//walls cannot be built more frequently than N steps 
+	public int M = 5;//max walls
 	public int SQ_CAPTURE_DIST = 16;
 	
 	public Hunter _hunter;
 	public Prey _prey;
 	public List<Wall> _walls;
+	public List<Move> prevHunterMoves;
+	static String hunterStr = "HUNTER";
+	static String preyStr = "PREY";
+	
+	
+	public int[][] wallNo = new int[300][300];
 	
 	public int time = 0;
 	
@@ -34,11 +40,15 @@ public class Board {
 		_walls = new ArrayList<Wall>();
 		_hunter.hl.xloc = 0; _hunter.hl.yloc = 0;
 		_prey.pl.xloc = PREY_INIT_X; _prey.pl.yloc = PREY_INIT_Y;
+		prevHunterMoves = new ArrayList<Move>();
 	}
-	public void addHunterMove(HunterMove hm) {
+	public HunterMove addHunterMove(HunterMove hm) {
+		System.out.println("addHunterMove[0]");
 		HunterMove ehm = getEffectiveHunterMove(hm);
+		System.out.println("addHunterMove[1] ehm.deltaX="+ehm.deltaX + " ehm.deltaY=" + ehm.deltaY);
 		_hunter.hl.xloc += ehm.deltaX;
 		_hunter.hl.yloc += ehm.deltaY;
+		System.out.println("addHunterMove[2]");
 		CardinalDirections origDir = CardinalDirections.getDirectionFromMove(hm);
 		CardinalDirections newDir = CardinalDirections.getDirectionFromMove(ehm);
 		if (origDir == newDir) {
@@ -52,10 +62,21 @@ public class Board {
 		}
 		
 		//build or tear walls down
-		_walls.add(hm.buildWall);
-		for (Wall aw:hm.teardownWalls) {
-			removeWall(aw.wallIndex);
+		System.out.println("addHunterMove[3]");
+		if(hm.buildWall != null){ _walls.add(hm.buildWall); }
+		System.out.println("addHunterMove[3-1]");
+		System.out.println("addHunterMove[3-2] hm.teardownWalls=" + hm.teardownWalls);
+		if(hm.teardownWalls != null){
+			for (Wall aw:hm.teardownWalls) {
+				System.out.println("addHunterMove[4]");
+				removeWall(aw.wallIndex);
+			}
 		}
+	
+		System.out.println("addHunterMove[5] ehm.deltaX=" + ehm.deltaX + " ehm.deltaY=" + ehm.deltaY);
+		prevHunterMoves.add(ehm);
+		System.out.println("addHunterMove[6]");
+		return ehm;
 	}
 	
 	public void removeWall(int idx) {
@@ -69,7 +90,7 @@ public class Board {
 		}
 	}
 	
-	public void addPreyMove(PreyMove pm) {
+	public PreyMove addPreyMove(PreyMove pm) {
 		PreyMove epm = getEffectivePreyMove(pm);
 		_prey.pl.xloc += epm.deltaX;
 		_prey.pl.yloc += epm.deltaY;
@@ -84,27 +105,44 @@ public class Board {
 				_prey.preyDirection = CardinalDirections.getReflectedDirFromOriginalDirAndFinalDelta(origDir, epm.deltaX, epm.deltaY);
 			}
 		}
-		
+		return epm;
 	}
 	
 	//calculate move after bounces
 	public HunterMove getEffectiveHunterMove (HunterMove hm) {
-		return (HunterMove) getEffectiveMove(hm);
+		System.out.println("getEffectiveHunterMove[0]");
+		//return (HunterMove) getEffectiveMove(hm);
+		HunterMove m = (HunterMove)getEffectiveMove(hm, Board.hunterStr);
+		System.out.println("getEffectiveHunterMove[1] m.deltaX=" + m.deltaX + " m.deltaY=" + m.deltaY);
+		return m;
 	}
 	
 	//calculate move after bounces
 	public PreyMove getEffectivePreyMove(PreyMove pm) {
-		return (PreyMove) getEffectiveMove(pm);
+		return (PreyMove) getEffectiveMove(pm, Board.preyStr);
 	}
 	
-	public Move getEffectiveMove(Move mv) {
+	public Move getEffectiveMove(Move mv, String s) {
+		System.out.println("getEffectiveMove[0] mv.deltaX=" + mv.deltaX + " mv.deltaY=" + mv.deltaY);
+		
 		Location target = new Location();
+		System.out.println("getEffectiveMove[0-1-1]");
+		
+		System.out.println("getEffectiveMove[0-1] mv.fromX=" + mv.fromX + " mv.fromY=" + mv.fromY);
+		
 		target.xloc = mv.fromX + mv.deltaX;
 		target.yloc = mv.fromY + mv.deltaY;
-		Move effm = new Move();
+		
+		System.out.println("getEffectiveMove[0-1] target.xloc=" + target.xloc + " target.yloc=" + target.yloc);
+		Move effm = null;
+		if(s == "HUNTER"){ effm = new HunterMove(); }
+		else{ effm = new PreyMove(); }
 		effm.fromX = mv.fromX; effm.fromY = mv.fromY;
 		effm.deltaX = mv.deltaX; effm.deltaY = mv.deltaY;
 		
+		System.out.println("getEffectiveMove[0-1] effm.deltaX=" + effm.deltaX + " effm.deltaY=" + effm.deltaY);
+		
+		System.out.println("getEffectiveMove[1]");
 		if (target.yloc > MAX_Y) {
 			effm.deltaY = 0;
 		}
@@ -118,6 +156,9 @@ public class Board {
 		if (target.xloc < MIN_X) {
 			effm.deltaX = 0;
 		}
+		
+		System.out.println("getEffectiveMove[2] target=" + target.xloc + " " + target.yloc);
+		System.out.println("getEffectiveMove[2-2] effm=" + effm.deltaX + " " + effm.deltaY);
 		Wall aw = getWallThatRunsThrough(target);
 		if (aw != null) {		
 			if (aw.getOrientation() == Orientation.HORIZONTAL) {
@@ -125,14 +166,29 @@ public class Board {
 			} else {
 				effm.deltaX = 0;
 			}
-			return getEffectiveMove(effm);
+			
+			System.out.println("getEffectiveMove[3] effm.deltaY=" + effm.deltaY + " effm.deltaX=" + effm.deltaX);
+			return getEffectiveMove(effm, s);
 		} else {
+			System.out.println("getEffectiveMove[4]");
+			System.out.println("getEffectiveMove[4-1] effm=" + effm.deltaX + " " + effm.deltaY);
 			return effm;
-		}		
+		}
 	}
 	
+
 	public Wall getWallThatRunsThrough(Location a) {
+		System.out.println("getWallThatRunsThrough[0] _walls.size()==" + _walls.size());
+		for(int i=0; i<_walls.size(); i++){
+			System.out.println("getWallThatRunsThrough[0-1] aw==" + _walls.get(i));
+		}
+		
+		
 		for (Wall aw : _walls) {
+			System.out.println("getWallThatRunsThrough[0] aw==" + aw);
+			System.out.println("getWallThatRunsThrough[1-1] aw start xloc=" + aw.leftEnd.xloc + " yloc=" + aw.leftEnd.yloc);
+			System.out.println("getWallThatRunsThrough[1-2] aw end xloc=" + aw.rightEnd.xloc + " yloc=" + aw.rightEnd.yloc);			
+			System.out.println("getWallThatRunsThrough[1-3] wallIdx=" + aw.wallIndex);
 			if (aw.getOrientation() == Orientation.VERTICAL) {
 				if (aw.leftEnd.xloc == a.xloc) {
 					if ( (aw.leftEnd.yloc <= a.yloc) && (a.yloc <= aw.rightEnd.yloc) ) {
@@ -140,6 +196,7 @@ public class Board {
 					}
 				}				
 			} else {//horizontal wall
+				System.out.println("getWallThatRunsThrough[2]");
 				if (aw.leftEnd.yloc == a.yloc) {
 					if ( (aw.leftEnd.xloc <= a.xloc) && (a.xloc <= aw.rightEnd.xloc) ) {
 						return aw;
@@ -147,6 +204,7 @@ public class Board {
 				}
 			}
 		}
+		System.out.println("getWallThatRunsThrough[3]");
 		return null;
 	}
 	
@@ -280,5 +338,50 @@ public class Board {
 	public static double getDistanceSq(Location a, Location b) {
 		return ((a.xloc - b.xloc)*(a.xloc - b.xloc) + 
 				(a.yloc - b.yloc)*(a.yloc - b.yloc));
+	}
+	
+	public boolean testWillBeCaught(Location a, Location b) {
+		double distsq = getDistanceSq(a, b);
+		if ( (distsq < SQ_CAPTURE_DIST) && !wallExistsBetween(a, b) ) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void printWalls(){
+		for(int i=0; i<_walls.size(); i++){
+			System.out.println(_walls.get(i).wallIndex);
+		}
+	}
+	
+	
+	public int hasOverlapWall(Wall wall){
+		System.out.println("Board hasOverlapWall[0] _walls.size()=" + _walls.size());
+		for(int i=0; i<_walls.size(); i++){
+			System.out.println("Board hasOverlapWall[1]");
+			if(wall.leftEnd.xloc == _walls.get(i).leftEnd.xloc &&
+					wall.leftEnd.xloc == wall.rightEnd.xloc &&
+					_walls.get(i).leftEnd.xloc == _walls.get(i).rightEnd.xloc &&
+					(wall.leftEnd.yloc >= _walls.get(i).leftEnd.yloc ||
+					wall.rightEnd.yloc <= _walls.get(i).rightEnd.yloc)){
+				System.out.println("Board hasOverlapWall[2-1-1] " + _walls.get(i).wallIndex + " startX=" + _walls.get(i).leftEnd.xloc + " startY=" + _walls.get(i).leftEnd.yloc);
+				System.out.println("Board hasOverlapWall[2-1-2] " + _walls.get(i).wallIndex + " endX=" + _walls.get(i).rightEnd.xloc + " endY=" + _walls.get(i).rightEnd.yloc);
+				System.out.println("Board hasOverlapWall[2-1]");
+				return i;
+			}
+			
+			if(wall.leftEnd.yloc == _walls.get(i).leftEnd.yloc &&
+					wall.leftEnd.yloc == wall.rightEnd.yloc &&
+					_walls.get(i).leftEnd.yloc == _walls.get(i).rightEnd.yloc &&
+					(wall.leftEnd.xloc >= _walls.get(i).leftEnd.xloc ||
+					wall.rightEnd.xloc <= _walls.get(i).rightEnd.xloc)){
+				System.out.println("Board hasOverlapWall[2-2-1] " + _walls.get(i).wallIndex + " startX=" + _walls.get(i).leftEnd.xloc + " startY=" + _walls.get(i).leftEnd.yloc);
+				System.out.println("Board hasOverlapWall[2-2-2] " + _walls.get(i).wallIndex + " endX=" + _walls.get(i).rightEnd.xloc + " endY=" + _walls.get(i).rightEnd.yloc);
+				System.out.println("Board hasOverlapWall[2-2]");
+				return i;
+			}
+		}
+		System.out.println("Board hasOverlapWall[4]");
+		return -1;
 	}
 }

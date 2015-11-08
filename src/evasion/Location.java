@@ -10,4 +10,11 @@ public class Location {
 		}
 		return false;
 	}
+	
+	public Location(){}
+	
+	public Location(int xloc, int yloc){
+		this.xloc = xloc;
+		this.yloc = yloc;
+	}
 }

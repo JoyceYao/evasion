@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.BitSet;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import evasion.hunter.HunterMove;
@@ -27,13 +28,15 @@ public class Main {
 	//int port = 1992; //Prey to Server Port
 	final static int ARGS_LEN = 7;
 	//$java -jar evasion.jar -rH -sR -tmv_cly -p1337 -N3 -M10 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws JSONException {
 	
 		Main m = new Main();
 		m.board = new Board();
 		m.tcpClient = new TCPClient();
 		
 		BitSet bs = new BitSet(ARGS_LEN);
+		
+		System.out.println("bs.cardinality()=" + bs.cardinality());
 		
 		if (args.length != ARGS_LEN) {
 			System.out.println("Not all initialization command line arguments were specified. Halting");
@@ -81,6 +84,8 @@ public class Main {
 					break;
 			}
 		}
+		
+		System.out.println("bs.cardinality()=" + bs.cardinality());
 		if (bs.cardinality() != ARGS_LEN) {
 			System.out.println("Not all initialization parameters supplied. Halting");
 			System.exit(-1);
@@ -121,7 +126,7 @@ public class Main {
 		} while (playing);
 	}
 	
-	private void Evade() throws IOException {
+	private void Evade() throws IOException, JSONException {
 		boolean playing = true;
 		do {
 			System.out.print("pos: " + publisher.getPositions());
@@ -186,7 +191,7 @@ public class Main {
 		return teamName;
 	}
 
-	private String getNextMove(String[] line){
+	private String getNextMove(String[] line) throws JSONException{
 		JSONObject jsonObj = new JSONObject(line);
 		// store other players' move to my board
 //		for(int i=0; i<line.length-1; i++){
