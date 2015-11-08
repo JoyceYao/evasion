@@ -45,7 +45,7 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public HuntApp() {
 		board = new Board();
-		strategy = AbsHunterStrategy.getStrategy("R");
+		strategy = AbsHunterStrategy.getStrategy("W");
 		//hep = 
         setUpConnection(hunterEndpoint, publisherEndpoint);
 	}
