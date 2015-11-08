@@ -60,14 +60,14 @@ public class MessagePublisher {
 	public String getPositions() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		JSONObject j = new JSONObject();
-		j.put("Command", "P");
+		j.put("command", "P");
 		return sendAndReceive(j.toString());
 	}
 	
 	public String getWalls() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		JSONObject j = new JSONObject();
-		j.put("Command", "W");
+		j.put("command", "W");
 		return sendAndReceive(j.toString());
 	}
 	
