@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="evasionServer.jar"/>
-	<classpathentry kind="lib" path="hunter.jar"/>
 	<classpathentry kind="lib" path="lib/evasion-0.0.1-SNAPSHOT-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="lib/hunter.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-2.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-databind-2.5.4.jar"/>
 	<classpathentry kind="lib" path="lib/javaee-api-7.0.jar"/>
@@ -12,8 +9,6 @@
 	<classpathentry kind="lib" path="lib/jetty-all-9.0.4.v20130625.jar"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/org.json-20120521.jar"/>
-	<classpathentry kind="lib" path="lib/prey.jar"/>
-	<classpathentry kind="lib" path="lib/statusApp.jar"/>
 	<classpathentry kind="lib" path="lib/tyrus-client-1.12.jar"/>
 	<classpathentry kind="lib" path="lib/tyrus-container-grizzly-client-1.12.jar"/>
 	<classpathentry kind="lib" path="lib/tyrus-core-1.2.jar"/>

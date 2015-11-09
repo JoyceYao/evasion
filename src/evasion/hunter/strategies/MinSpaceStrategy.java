@@ -20,6 +20,10 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	int prevDeltaY = 1;
 	int lastCreateWallTime = 0;
 	int currSteps = 0;
+	
+	public MinSpaceStrategy(){
+		System.out.println("MinSpaceStrategy");
+	}
 
 	@Override
 	public HunterMove makeAMove(Board b) {
@@ -33,11 +37,6 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			System.out.println("MinSpaceStrategy makeAMove[1]");
 			hm = (HunterMove)CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection, "HUNTER");
 			HunterMove prevMove = hunterMoveHist.get(hunterMoveHist.size()-1);
-
-			//hm.fromX = b._hunter.hl.xloc;
-			//hm.fromY = b._hunter.hl.yloc;
-			//hm.deltaX = prevDeltaX;
-			//hm.deltaY = prevDeltaY;
 			
 			System.out.println("MinSpaceStrategy makeAMove[2] hm.deltaX=" + hm.deltaX + " hm.deltaY=" + hm.deltaY);
 			//if (b.wallExistsBetween(b._hunter.hl, new Location(nextX, nextY))){
@@ -50,8 +49,16 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			System.out.println("MinSpaceStrategy makeAMove[2-0-1] prevMove.fromY" + prevMove.fromY);
 			System.out.println("MinSpaceStrategy makeAMove[2-0-1] b._prey.pl.yloc" + b._prey.pl.yloc);			
 			if(lastCreateWallTime <= 0 || lastCreateWallTime + b.N < currSteps && 
-					(Math.abs(prevMove.fromX-b._prey.pl.xloc) == 3 || Math.abs(prevMove.fromX-b._prey.pl.xloc) == 3)){ 
+					(Math.abs(prevMove.fromX-b._prey.pl.xloc) == 4 || Math.abs(prevMove.fromX-b._prey.pl.xloc) == 4)){ 
 				newWall = getWall(b, prevMove, b._prey); 
+			}
+			
+			int meetTime = Math.min(Math.abs(b._hunter.hl.xloc - b._prey.pl.xloc), Math.abs(b._hunter.hl.yloc - b._prey.pl.yloc));
+			if(newWall == null && (lastCreateWallTime <= 0 || lastCreateWallTime + b.N < currSteps) && meetTime == b.N+2){
+				Wall tmpWall = getSmallestEnclosingWall(b._walls, b._hunter.hl, hm.deltaX, hm.deltaY, b._prey.pl);
+				if(tmpWall.enclosingArea < Integer.MAX_VALUE){
+					newWall = tmpWall;
+				}
 			}
 			
 			System.out.println("MinSpaceStrategy makeAMove[2-0] newWall=" + newWall);
@@ -144,7 +151,7 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy getWall[1] p.pl.xloc=" + p.pl.xloc);
 		System.out.println("MinSpaceStrategy getWall[1] prevHM.fromY=" + prevHM.fromY);
 		System.out.println("MinSpaceStrategy getWall[1] p.pl.yloc=" + p.pl.yloc);
-		if(Math.abs(prevHM.fromX-p.pl.xloc) == 3){
+		if(Math.abs(prevHM.fromX-p.pl.xloc) == 4){
 			//get smallest enclosing wall
 			Location hloc = new Location(prevHM.fromX, prevHM.fromY);
 			Wall thisWall = getSmallestEnclosingWall(b._walls, hloc, prevHM.deltaX, prevHM.deltaY, p.pl);
@@ -162,7 +169,7 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 				return nextWall;
 			}
 			
-		} else if (Math.abs(prevHM.fromY-p.pl.yloc) == 3){
+		} else if (Math.abs(prevHM.fromY-p.pl.yloc) == 4){
 			//get smallest enclosing wall
 			Location hloc = new Location(prevHM.fromX, prevHM.fromY);
 			Wall thisWall = getSmallestEnclosingWall(b._walls, hloc, prevHM.deltaX, prevHM.deltaY, p.pl);
@@ -219,10 +226,15 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[2]");
 		
 		int hWallArea = 0;
-		if(hl.yloc > pl.yloc){ //S wall
-			hWallArea = (maxX-minX)*(hl.yloc-minY);
-		}else{ // N wall
-			hWallArea = (maxX-minX)*(maxY-hl.yloc);
+		//if hunter going south and the prey is in the north, or vice versa , then don't build wall
+		if((deltaY > 0 && pl.yloc < hl.yloc) || (deltaY < 0 && pl.yloc > hl.yloc)){
+			hWallArea = Integer.MAX_VALUE;
+		}else{
+			if(hl.yloc > pl.yloc){ //S wall
+				hWallArea = (maxX-minX)*(hl.yloc-minY);
+			}else{ // N wall
+				hWallArea = (maxX-minX)*(maxY-hl.yloc);
+			}
 		}
 		hWall.enclosingArea = hWallArea;
 		
@@ -235,10 +247,15 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		System.out.println("MinSpaceStrategy getSmallestEnclosingWall[4]");
 		
 		int vWallArea = 0;
-		if(hl.xloc < pl.xloc){  // W wall
-			vWallArea = (maxX-hl.xloc)*(maxY-minY);
-		}else{ // E wall
-			vWallArea = (hl.xloc-minX)*(maxY-minY);
+		//if hunter going east and the prey is in the west, or vice versa , then don't build wall
+		if(deltaX > 0 && pl.xloc < hl.xloc || deltaX < 0 && pl.xloc > hl.xloc){
+			vWallArea = Integer.MAX_VALUE;
+		}else{
+			if(hl.xloc < pl.xloc){  // W wall
+				vWallArea = (maxX-hl.xloc)*(maxY-minY);
+			}else{ // E wall
+				vWallArea = (hl.xloc-minX)*(maxY-minY);
+			}
 		}
 		vWall.enclosingArea = vWallArea;
 		

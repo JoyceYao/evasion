@@ -43,7 +43,7 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public PreyApp() {
 		board = new Board();
-		strategy = AbsPreyStrategy.getStrategy("R");
+		strategy = AbsPreyStrategy.getStrategy("F");
         setUpConnection(preyEndpoint, publisherEndpoint);
 	}
 	
@@ -79,12 +79,14 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
+        System.out.println("befroe sleeping");
         try {
-			Thread.sleep(5000);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        System.out.println("after sleeping");
     }
     
     public void playerMakeMove() {

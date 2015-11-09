@@ -45,7 +45,7 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public HuntApp() {
 		board = new Board();
-		strategy = AbsHunterStrategy.getStrategy("R");
+		strategy = AbsHunterStrategy.getStrategy("W");
 		//hep = 
         setUpConnection(hunterEndpoint, publisherEndpoint);
 	}
@@ -63,12 +63,14 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
+        System.out.println("befroe sleeping");
         try {
-			Thread.sleep(5000);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        System.out.println("after sleeping");
     }
     
     public void playerMakeMove() {
