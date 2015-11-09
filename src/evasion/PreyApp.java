@@ -79,6 +79,12 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
+        try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public void playerMakeMove() {
@@ -191,7 +197,11 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
                 System.out.println(pe);
             }
 
-
+            boolean gameOver = (Boolean) jsonObject.get("gameover");
+            if (gameOver) {
+            	System.out.println("Gameover from publisher.. Exiting..");
+            	System.exit(0);
+            }
             
             JSONArray preyCoordinates = (JSONArray) jsonObject.get("prey");
             System.out.println(preyCoordinates);
@@ -211,11 +221,6 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 
             long timeL = (Long) jsonObject.get("time");
             board.time = (int) timeL;
-            boolean gameOver = (Boolean) jsonObject.get("gameover");
-            if (gameOver) {
-            	System.out.println("No way, Hannan!!!");
-            	return;
-            }
             
             updateWalls((JSONArray)jsonObject.get("walls"));
 

@@ -63,6 +63,12 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
+        try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public void playerMakeMove() {
@@ -187,6 +193,12 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
             catch (ParseException pe) {
                 System.out.println(pe);
             }
+            
+            boolean gameOver = (Boolean) jsonObject.get("gameover");
+            if (gameOver) {
+            	System.out.println("Gameover from publisher.. Exiting..");
+            	System.exit(0);
+            }
 
             JSONArray hunterCoordinates = (JSONArray) jsonObject.get("hunter");
             //Point hunterPoint = parseJSONArrayCoordinates(hunterCoordinates);
@@ -212,17 +224,9 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 
             long timeL = (Long) jsonObject.get("time");
             board.time = (int) timeL;
-
-            boolean gameOver = (Boolean) jsonObject.get("gameover");
-            if (gameOver) {
-            	System.out.println("No way, Hannan!!!");
-            	return;
-            }
             
             updateWalls((JSONArray)jsonObject.get("walls"));
-
         }
-
         catch (Exception e) {
             System.out.println(e);
         }
