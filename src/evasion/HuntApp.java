@@ -70,7 +70,7 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 			e.printStackTrace();
 		}
     }
-    
+
     public void playerMakeMove() {
     	//Hunter moves immediately
         HunterMove hm = MakeDecision();
