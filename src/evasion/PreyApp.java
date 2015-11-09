@@ -43,7 +43,7 @@ public class PreyApp implements GameWithPublisherSocket, GameWithPlayerSocket{
 	
 	public PreyApp() {
 		board = new Board();
-		strategy = AbsPreyStrategy.getStrategy("F");
+		strategy = AbsPreyStrategy.getStrategy("R");
         setUpConnection(preyEndpoint, publisherEndpoint);
 	}
 	

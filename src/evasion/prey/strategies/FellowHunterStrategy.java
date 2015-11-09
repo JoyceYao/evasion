@@ -49,7 +49,7 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 		PreyMove m = new PreyMove();
 		
 		//Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
-		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection);
+		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection, "PREY");
 		
 		System.out.println("getBestDirection[0] hm=" + hm.toString());
 		

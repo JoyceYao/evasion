@@ -3,6 +3,7 @@ package evasion.hunter.strategies;
 import java.util.*;
 
 import evasion.Board;
+import evasion.CardinalDirections;
 import evasion.Move;
 import evasion.Location;
 import evasion.Wall;
@@ -30,23 +31,14 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 			return hm;
 		} else {
 			System.out.println("MinSpaceStrategy makeAMove[1]");
-			hm = new HunterMove();
+			hm = (HunterMove)CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection, "HUNTER");
 			HunterMove prevMove = hunterMoveHist.get(hunterMoveHist.size()-1);
 
-			//int nextX = b._hunter.hl.xloc + prevMove.deltaX;
-			//int nextY = b._hunter.hl.yloc + prevMove.deltaY;
-			hm.fromX = b._hunter.hl.xloc;
-			hm.fromY = b._hunter.hl.yloc;
-			hm.deltaX = prevDeltaX;
-			hm.deltaY = prevDeltaY;
+			//hm.fromX = b._hunter.hl.xloc;
+			//hm.fromY = b._hunter.hl.yloc;
+			//hm.deltaX = prevDeltaX;
+			//hm.deltaY = prevDeltaY;
 			
-			//if(hunterMoveHist.size() > 2){
-				//HunterMove prevpreMove = hunterMoveHist.get(hunterMoveHist.size()-2);
-				//if(prevpreMove.deltaX == 0 || prevpreMove.deltaY == 0){
-				//	prevpreMove = hunterMoveHist.get(hunterMoveHist.size()-3);
-				//}
-			
-			//}
 			System.out.println("MinSpaceStrategy makeAMove[2] hm.deltaX=" + hm.deltaX + " hm.deltaY=" + hm.deltaY);
 			//if (b.wallExistsBetween(b._hunter.hl, new Location(nextX, nextY))){
 			Wall newWall = null;
@@ -89,8 +81,7 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 						}
 					}
 				}
-				
-			}	
+			}
 		
 			System.out.println("MinSpaceStrategy makeAMove[6-0]");
 			
@@ -101,36 +92,39 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 		
 		
 		//System.out.println("MinSpaceStrategy makeAMove[3-2-1] b._walls.get(0)="+b._walls.get(0));
+		System.out.println("MinSpaceStrategy makeAMove[6-2] b._walls.size()=" + b._walls.size());
+		System.out.println("MinSpaceStrategy makeAMove[6-2] b.M=" + b.M);
 		if(b._walls.size() > 0 && b._walls.size() == b.M){
 			if(hm.teardownWalls == null){
 				hm.teardownWalls = new ArrayList<Wall>();
 			}
+			System.out.println("MinSpaceStrategy makeAMove[6-3] b._walls.get(0)="+b._walls.get(0));
 			hm.teardownWalls.add(b._walls.get(0));
 		}
 		
-		System.out.println("MinSpaceStrategy makeAMove[7]");
-		HunterMove m = b.addHunterMove(hm);
-		System.out.println("MinSpaceStrategy makeAMove[8]");
-		hunterMoveHist.add(m);
-		m.buildWall = hm.buildWall;
-		m.teardownWalls = hm.teardownWalls;
-		System.out.println("MinSpaceStrategy makeAMove[9]");
-		System.out.println(m.moveToString());
-		System.out.println("MinSpaceStrategy makeAMove[10]");
+		//System.out.println("MinSpaceStrategy makeAMove[7]");
+		//HunterMove m = b.addHunterMove(hm);
+		//System.out.println("MinSpaceStrategy makeAMove[8]");
+		hunterMoveHist.add(hm);
+		//m.buildWall = hm.buildWall;
+		//m.teardownWalls = hm.teardownWalls;
+		//System.out.println("MinSpaceStrategy makeAMove[9]");
+		//System.out.println(m.moveToString());
+		//System.out.println("MinSpaceStrategy makeAMove[10]");
 		
-		if(m.deltaX == 0){
-			prevDeltaX *= -1;
-		}
-		if(m.deltaY == 0){
-			prevDeltaY *= -1;
-		}
+		//if(hm.deltaX == 0){
+		//	prevDeltaX *= -1;
+		//}
+		//if(hm.deltaY == 0){
+		//	prevDeltaY *= -1;
+		//}
 		
 		System.out.println("MinSpaceStrategy makeAMove[11] prevDeltaX=" + prevDeltaX + " prevDeltaY=" + prevDeltaY);
 
 		//if(hm.teardownWalls == null){ hm.teardownWalls = new ArrayList<Wall>(); }
 		currSteps++;
-		if(m.buildWall != null){ lastCreateWallTime = currSteps; }
-		return m;
+		if(hm.buildWall != null){ lastCreateWallTime = currSteps; }
+		return hm;
 	}
 	
 	private HunterMove getInitialMove(){

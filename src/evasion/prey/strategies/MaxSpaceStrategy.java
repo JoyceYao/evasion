@@ -52,7 +52,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		int thisFromY = pl.yloc;
 
 		//Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
-		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection);
+		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection, "PREY");
 		
 		System.out.println("getBestDirection[0] hm=" + hm.toString());
 		
