@@ -19,6 +19,8 @@ public abstract class AbsHunterStrategy {
 				return new HSRandomV1();
 			case "W":
 				return new MinSpaceStrategy();
+			case "T":
+				return new Test();				
 			default:
 				return new HSRandomV1();
 		}

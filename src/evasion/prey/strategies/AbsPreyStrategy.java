@@ -20,7 +20,9 @@ public abstract class AbsPreyStrategy {
 			case "W":
 				return new MaxSpaceStrategy();
 			case "F":
-				return new FellowHunterStrategy();				
+				return new FellowHunterStrategy();	
+			case "T":
+				return new Test();	
 			default:
 				return new PRRandomV1();
 		}

@@ -64,14 +64,14 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
-        System.out.println("befroe sleeping");
-        try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
+        //System.out.println("befroe sleeping");
+        //try {
+		//	Thread.sleep(100);
+		//} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        System.out.println("after sleeping");
+		//	e.printStackTrace();
+		//}
+        //System.out.println("after sleeping");
     }
 
     public void playerMakeMove() {

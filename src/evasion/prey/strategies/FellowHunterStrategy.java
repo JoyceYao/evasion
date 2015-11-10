@@ -1,5 +1,6 @@
 package evasion.prey.strategies;
 
+import java.util.Arrays;
 import java.util.List;
 
 import evasion.Board;
@@ -77,19 +78,63 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 		return m;
 	}
 	
+	/*
+	private Location findSafePoint(List<Wall> walls, Location[] locs, Move hm, Location hl, Location pl){
+		// = hs.getMinMaxXY(walls, hl, pl);
+		int xDiff = Math.abs(hl.xloc-pl.xloc);
+		int yDiff = Math.abs(hl.yloc-pl.yloc);
+		int time = Math.min(xDiff, yDiff);
+		
+		boolean[][] zone = new boolean[9][9];
+		for(boolean[] row:zone){ Arrays.fill(row, true); }
+		int minX = pl.xloc-4;
+		int minY = pl.yloc-4;
+		
+		for(int i=-4; i<=4; i++){
+			for(int j=-4; j<=4; j++){
+				if(pl.xloc+i < 0 ||pl.xloc+i > Board.MAX_X || pl.yloc+i < 0 || pl.xloc+i > Board.MAX_X){ 
+					zone[i+4][j+4] = false; 
+				}
+			}
+		}
+		
+		for(int i=0; i<8; i++){
+			int hunterFutureX = hs.getFutureXLoc(hl, hm.deltaX, walls, i);
+			int hunterFutureY = hs.getFutureYLoc(hl, hm.deltaY, walls, i);
+			for(int j=-4; j<=4; j++){
+				for(int k=-4; k<=4; k++){
+					if(Math.abs(j*k) == 16){ continue; }
+					int xTmp = hunterFutureX+j;
+					int yTmp = hunterFutureY+k;
+					zone[j+4][k+4] = false;
+				}
+			}
+		}
+		
+	}*/
+	
 	private PreyMove getCounterDirection(Board b, Move hm, Location hl, Location pl){
 		PreyMove m = new PreyMove();
-		int caughtTime = 8;
+		//int caughtTime = 8;
+		int xDiff = Math.abs(hl.xloc-pl.xloc);
+		int yDiff = Math.abs(hl.yloc-pl.yloc);
+		int time = Math.min(xDiff, yDiff);
+		
 		// if in the hunter's way, get away from it
-		int hunterFutureX = hs.getFutureXLoc(hl, hm.deltaX, b._walls, caughtTime);
-		int hunterFutureY = hs.getFutureYLoc(hl, hm.deltaY, b._walls, caughtTime);
+		int hunterFutureX = hs.getFutureXLoc(hl, hm.deltaX, b._walls, time);
+		int hunterFutureY = hs.getFutureYLoc(hl, hm.deltaY, b._walls, time);
 		
 		int bestDeltaX = 0;
 		int bestDeltaY = 0;
 		
+		System.out.println("getCounterDirection hunterFutureX==" + hunterFutureX);
+		System.out.println("getCounterDirection hunterFutureY==" + hunterFutureY);
+		
 		// In danger
-		if(Math.abs(pl.xloc-hunterFutureX) <= 4 && Math.abs(pl.yloc-hunterFutureY) <= 4){
+		if(Math.abs(pl.xloc-hunterFutureX) <= 6 && Math.abs(pl.yloc-hunterFutureY) <= 6){
+			System.out.println("getCounterDirection[2]");
 			if(pl.yloc < hunterFutureY){
+				System.out.println("getCounterDirection[2-1]");
 				if(hm.deltaY < 0){
 					// if the hunter go north(deltaY < 0) and the prey are above the hunter path, go horizontally counter direction
 					bestDeltaX = hm.deltaX*-1;
@@ -97,6 +142,7 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 					bestDeltaY = hm.deltaY*-1;
 				}
 			}else{
+				System.out.println("getCounterDirection[2-2]");
 				// if below the path
 				if(hm.deltaY < 0){
 					bestDeltaY = hm.deltaY*-1;	
@@ -108,14 +154,20 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 			// go to the counter direction of the hunter
 			bestDeltaX = hm.deltaX*-1;
 			bestDeltaY = hm.deltaY*-1;
+			System.out.println("getCounterDirection[2-3]");
 		}
 		
 		m.fromX = pl.xloc;
 		m.fromY = pl.yloc;
 		m.deltaX = bestDeltaX;
 		m.deltaY = bestDeltaY;
+		
+		System.out.println("getCounterDirection[3-1] deltaX="+bestDeltaX);
+		System.out.println("getCounterDirection[3-2] deltaY="+bestDeltaY);
+		System.out.println("getCounterDirection[3-3] ");
 		return m;
 	}
+	
 	
 	private PreyMove getLeavingDirection(Board b, Move hm, Location hl, Location pl){
 		PreyMove m = new PreyMove();
@@ -127,6 +179,9 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 		int hunterFutureX = hs.getFutureXLoc(hl, hm.deltaX, b._walls, time);
 		int hunterFutureY = hs.getFutureYLoc(hl, hm.deltaY, b._walls, time);
 		
+		System.out.println("getLeavingDirection hunterFutureX==" + hunterFutureX);
+		System.out.println("getLeavingDirection hunterFutureY==" + hunterFutureY);
+		
 		int bestDeltaX = 0;
 		int bestDeltaY = 0;
 		
@@ -137,6 +192,7 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 			}else{
 				bestDeltaY = hm.deltaY*-1;
 			}
+			System.out.println("getLeavingDirection [2]");
 		}else{
 			// if below the path
 			if(hm.deltaY < 0){
@@ -144,12 +200,17 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 			}else{
 				bestDeltaX = hm.deltaX*-1;
 			}
+			System.out.println("getLeavingDirection [3]");
 		}
 		
 		m.fromX = pl.xloc;
 		m.fromY = pl.yloc;
 		m.deltaX = bestDeltaX;
 		m.deltaY = bestDeltaY;
+		
+		System.out.println("getLeavingDirection [3-1] deltaX=" + bestDeltaX);
+		System.out.println("getLeavingDirection [3-2] deltaY=" + bestDeltaY);
+		System.out.println("getLeavingDirection [3]");
 		return m;
 		
 	}

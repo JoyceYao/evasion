@@ -17,7 +17,7 @@ public class Board {
 	public static int PREY_INIT_X = 230;
 	public static int PREY_INIT_Y = 200;
 	
-	public int N = 2;//walls cannot be built more frequently than N steps 
+	public int N = 50;//walls cannot be built more frequently than N steps 
 	public int M = 5;//max walls
 	public int SQ_CAPTURE_DIST = 16;
 	
