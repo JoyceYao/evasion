@@ -6,3 +6,5 @@ runHunter.cmd
 runHunter.sh
 runPrey.cmd
 runPrey.sh
+.classpath
+.gitignore
