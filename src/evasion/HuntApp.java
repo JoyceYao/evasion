@@ -77,14 +77,23 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     public void playerMakeMove() {
     	//Hunter moves immediately
         HunterMove hm = MakeDecision();
+        
+    	String bdw = hm.BDWallToString();    	
+    	if ( (bdw != null) && !bdw.trim().equals("") ) {
+    		sendDecision(bdw);
+    		return;
+    	}
+    	
     	String bw = hm.buildWallToString();
     	if ( (bw != null) && !bw.trim().equals("") ) {
     		sendDecision(bw);
+    		return;
     	}
     	
     	String tw = hm.tearDownWallToString();
     	if ( (tw != null) && !tw.trim().equals("") ) {
     		sendDecision(tw);
+    		return;
     	}
         
     	String mv = hm.moveToString();
