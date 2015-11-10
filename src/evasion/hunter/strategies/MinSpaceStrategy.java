@@ -495,12 +495,16 @@ public class MinSpaceStrategy extends AbsHunterStrategy {
 	private Wall tearDownSeperateWall(Board b, HunterMove hm){
 		//int nextX = getFutureXLoc(b._hunter.hl, hm.deltaX, b._walls, 6);
 		//int nextY = getFutureYLoc(b._hunter.hl, hm.deltaY, b._walls, 6);
-		int nextX = hm.fromX + hm.deltaX*6;
-		nextX = nextX > Board.MAX_X ? nextX = Board.MAX_X : nextX < Board.MIN_X ? Board.MIN_X : nextX;
-		int nextY = hm.fromY + hm.deltaY*6;
-		nextY = nextY > Board.MAX_Y ? nextY = Board.MAX_Y : nextY < Board.MIN_Y ? Board.MIN_Y : nextY;
-		
-		Wall w1 = b.wallBetween(b._hunter.hl, new Location(nextX, nextY));
+		Wall w1 = null;
+		for(int i=1; i<=8; i++){
+			int nextX = hm.fromX + hm.deltaX*i;
+			nextX = nextX > Board.MAX_X ? nextX = Board.MAX_X : nextX < Board.MIN_X ? Board.MIN_X : nextX;
+			int nextY = hm.fromY + hm.deltaY*i;
+			nextY = nextY > Board.MAX_Y ? nextY = Board.MAX_Y : nextY < Board.MIN_Y ? Board.MIN_Y : nextY;
+			w1 = b.wallBetween(b._hunter.hl, new Location(nextX, nextY));
+			if(w1 != null){ break; }
+		}
+		 
 		Wall w2 = b.findWallBetween(b._hunter, b._prey);
 		
 		System.out.println("tearDownSeperateWall [0] w1==" + w1);
