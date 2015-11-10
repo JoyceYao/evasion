@@ -17,7 +17,7 @@ public class Board {
 	public static int PREY_INIT_X = 230;
 	public static int PREY_INIT_Y = 200;
 	
-	public int N = 100;//walls cannot be built more frequently than N steps 
+	public int N = 2;//walls cannot be built more frequently than N steps 
 	public int M = 5;//max walls
 	public int SQ_CAPTURE_DIST = 16;
 	
@@ -40,9 +40,9 @@ public class Board {
 		_walls = new ArrayList<Wall>();
 		_hunter.hl.xloc = 0; _hunter.hl.yloc = 0;
 		_prey.pl.xloc = PREY_INIT_X; _prey.pl.yloc = PREY_INIT_Y;
-		prevHunterMoves = new ArrayList<Move>();
+		//prevHunterMoves = new ArrayList<Move>();
 	}
-	public HunterMove addHunterMove(HunterMove hm) {
+	public void addHunterMove(HunterMove hm) {
 		System.out.println("addHunterMove[0]");
 		HunterMove ehm = getEffectiveHunterMove(hm);
 		System.out.println("addHunterMove[1] ehm.deltaX="+ehm.deltaX + " ehm.deltaY=" + ehm.deltaY);
@@ -74,9 +74,9 @@ public class Board {
 		}
 	
 		System.out.println("addHunterMove[5] ehm.deltaX=" + ehm.deltaX + " ehm.deltaY=" + ehm.deltaY);
-		prevHunterMoves.add(ehm);
+		//prevHunterMoves.add(ehm);
 		System.out.println("addHunterMove[6]");
-		return ehm;
+		//return ehm;
 	}
 	
 	public void removeWall(int idx) {
@@ -297,6 +297,40 @@ public class Board {
 			}
 		}
 		return false;
+	}
+	
+	public Wall wallBetween(Location a, Location b) {
+		for (Wall aw : _walls) {
+			if (aw.getOrientation() == Orientation.HORIZONTAL) {
+				if ( (a.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < b.yloc) ) {
+					if ( (aw.rightEnd.xloc >= a.xloc) && (aw.rightEnd.xloc >= b.xloc) 
+						&& (aw.leftEnd.xloc <= a.xloc) && (aw.leftEnd.xloc <= b.xloc) ) {
+						return aw;
+					}
+				}
+				if ( (b.yloc < aw.leftEnd.yloc) && (aw.leftEnd.yloc < a.yloc) ) {
+					if ( (aw.rightEnd.xloc >= a.xloc) && (aw.rightEnd.xloc >= b.xloc) 
+						&& (aw.leftEnd.xloc <= a.xloc) && (aw.leftEnd.xloc <= b.xloc) ) {
+						return aw;
+					}
+				}				
+			}
+			if (aw.getOrientation() == Orientation.VERTICAL) {
+				if ( (a.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < b.xloc) ) {
+					if ( (aw.rightEnd.yloc >= a.yloc) && (aw.rightEnd.yloc >= b.yloc) 
+						&& (aw.leftEnd.yloc <= a.yloc) && (aw.leftEnd.yloc <= b.yloc) ) {
+						return aw;
+					}
+				}
+				if ( (b.xloc < aw.leftEnd.xloc) && (aw.leftEnd.xloc < a.xloc) ) {
+					if ( (aw.rightEnd.yloc >= a.yloc) && (aw.rightEnd.yloc >= b.yloc) 
+						&& (aw.leftEnd.yloc <= a.yloc) && (aw.leftEnd.yloc <= b.yloc) ) {
+						return aw;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**

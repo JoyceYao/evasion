@@ -27,6 +27,7 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     boolean connectedToPlayer = false; 
     boolean connectedToPublisher = false; 
 
+    static int mvCount = 0;
     static HuntApp Hunter;
     //public HunterEndpoint hep;
     public Board board;
@@ -63,12 +64,14 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
         parsePublisherMessage(message);
         // USE this to decide your move
         playerMakeMove();
+        System.out.println("befroe sleeping");
         try {
-			Thread.sleep(500);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        System.out.println("after sleeping");
     }
 
     public void playerMakeMove() {
@@ -85,9 +88,10 @@ public class HuntApp implements GameWithPublisherSocket, GameWithPlayerSocket{
     	}
         
     	String mv = hm.moveToString();
-    	if ( (mv != null) && !mv.trim().equals("") ) {
+    	if ((mv != null) && !mv.trim().equals("") ) {
     		sendDecision(mv);
     	}
+    	//mvCount++;
     }
 
     private HunterMove MakeDecision() {

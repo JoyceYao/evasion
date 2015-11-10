@@ -52,7 +52,7 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		int thisFromY = pl.yloc;
 
 		//Move hm = b.prevHunterMoves.get(b.prevHunterMoves.size()-1);
-		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection);
+		Move hm = CardinalDirections.getMoveFromCardinalDirections(b._hunter.hl, b._hunter.hunterDirection, "PREY");
 		
 		System.out.println("getBestDirection[0] hm=" + hm.toString());
 		
@@ -91,10 +91,33 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 			System.out.println("getBestDirection[3] bestDeltaX=" + bestDeltaX);
 			System.out.println("getBestDirection[4] bestDeltaY=" + bestDeltaY);
 
-			
+		
 		} else {
+			// if hunter is leaving, go to the center of current enclosing space and wait
+			Location locs[] = hs.getMinMaxXY(b._walls, hl, pl);
+			int midX = (locs[0].xloc + locs[1].xloc)/2;
+			int midY = (locs[0].yloc + locs[1].yloc)/2;
+			if(pl.xloc < midX){
+				m.deltaX = 1;
+			}else if(pl.xloc > midX){
+				m.deltaX = -1;
+			}
+			
+			if(pl.yloc < midY){
+				m.deltaY = 1;
+			}else if(pl.yloc > midY){
+				m.deltaY = -1;
+			}
+			
 			m.fromX = thisFromX;
 			m.fromY = thisFromY;
+			
+			if(b.testWillBeCaught(new Location(hl.xloc+hm.deltaX, hl.yloc+hm.deltaY), new Location(pl.xloc+m.deltaX, pl.yloc+m.deltaY))){
+				// if it's danger to move forward, dont' move
+				m.deltaX = 0;
+				m.deltaY = 0;
+				
+			}
 		}
 		
 		return m;
@@ -111,18 +134,24 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 		int diffX = Math.abs(hl.xloc-pl.xloc);
 		if(Math.abs(hl.xloc+hm.deltaX-pl.xloc-deltaX) < Math.abs(hl.xloc-pl.xloc)){
 			if(hm.deltaX*deltaX < 0){
+				// hunter and prey go toward to each other in X direction
 				xMeetTime = diffX/3;
 				meetX = pl.xloc + deltaX*xMeetTime;
 			}else if(hm.deltaX != 0){
+				// prey doesn't move in X, hunter go to prey
 				xMeetTime = diffX/2;
-				meetX = pl.xloc;				
+				meetX = pl.xloc;	
 			}else{
+				// hunter doesn't move in X, prey go to hunter
 				xMeetTime = diffX;
 				meetX = hl.xloc;
 			}
 		}else{
 			xMeetTime = Integer.MAX_VALUE;
 		}
+		
+		System.out.println("getWallSpace[1-1] meetX=" + meetX);
+		System.out.println("getWallSpace[1-2] xMeetTime=" + xMeetTime);
 		
 		int yMeetTime = 0;
 		int meetY = -1;
@@ -142,37 +171,27 @@ public class MaxSpaceStrategy extends AbsPreyStrategy {
 			yMeetTime = Integer.MAX_VALUE;
 		}
 		
-		System.out.println("getWallSpace[1] xMeetTime=" + xMeetTime);
-		System.out.println("getWallSpace[2] yMeetTime=" + yMeetTime);
+		System.out.println("getWallSpace[2-1] meetY=" + meetY);
+		System.out.println("getWallSpace[2-2] yMeetTime=" + yMeetTime);
 		
 		if(xMeetTime == Integer.MAX_VALUE && yMeetTime == Integer.MAX_VALUE){
 			return -1;
 		}
 		
+		Location newPL = new Location();
+		Location newHL = new Location();
 		if(xMeetTime < yMeetTime){
-			pl.xloc = pl.xloc+xMeetTime*deltaX;
-			pl.yloc = pl.yloc+xMeetTime*deltaY;
-			hl.xloc = hl.xloc+xMeetTime*hm.deltaX;
-			hl.yloc = hl.yloc+xMeetTime*hm.deltaY;
-			
-			Location[] locs = hs.getMinMaxXY(walls, hl, pl);
-			if(pl.xloc < locs[0].xloc){ pl.xloc = locs[0].xloc; }
-			if(pl.yloc < locs[0].yloc){ pl.yloc = locs[0].yloc; }
-			if(pl.xloc > locs[1].xloc){ pl.xloc = locs[1].xloc; }
-			if(pl.yloc > locs[1].yloc){ pl.yloc = locs[1].yloc; }			
-			return hs.getInnerWallArea(walls, hl, pl);
+			newPL.xloc = pl.xloc+xMeetTime*deltaX;
+			newPL.yloc = pl.yloc+xMeetTime*deltaY;
+			newHL.xloc = hl.xloc+xMeetTime*hm.deltaX;
+			newHL.yloc = hl.yloc+xMeetTime*hm.deltaY;
 		}else{
-			pl.xloc = pl.xloc+yMeetTime*deltaX;
-			pl.yloc = pl.yloc+yMeetTime*deltaY;
-			hl.xloc = hl.xloc+yMeetTime*hm.deltaX;
-			hl.yloc = hl.yloc+yMeetTime*hm.deltaY;
-			
-			Location[] locs = hs.getMinMaxXY(walls, hl, pl);
-			if(pl.xloc < locs[0].xloc){ pl.xloc = locs[0].xloc; }
-			if(pl.yloc < locs[0].yloc){ pl.yloc = locs[0].yloc; }
-			if(pl.xloc > locs[1].xloc){ pl.xloc = locs[1].xloc; }
-			if(pl.yloc > locs[1].yloc){ pl.yloc = locs[1].yloc; }			
-			return hs.getInnerWallArea(walls, hl, pl);
+			newPL.xloc = pl.xloc+yMeetTime*deltaX;
+			newPL.yloc = pl.yloc+yMeetTime*deltaY;
+			newHL.xloc = hl.xloc+yMeetTime*hm.deltaX;
+			newHL.yloc = hl.yloc+yMeetTime*hm.deltaY;
 		}
+		Wall newWall = hs.getSmallestEnclosingWall(walls, newHL, hm.deltaX, hm.deltaY, newPL);
+		return newWall.enclosingArea;
 	}
 }

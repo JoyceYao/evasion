@@ -1,6 +1,7 @@
 package evasion;
 
 import evasion.hunter.HunterMove;
+import evasion.prey.PreyMove;
 
 public enum CardinalDirections {
 	N, //: [0,-1],
@@ -215,9 +216,15 @@ public enum CardinalDirections {
 		}
 	}
 	
-	public static Move getMoveFromCardinalDirections(Location loc, CardinalDirections cd){
+	public static Move getMoveFromCardinalDirections(Location loc, CardinalDirections cd, String classType){
 		if(loc == null){ return null; }
-		Move m = new Move();
+		Move m = null;
+		if(classType == "HUNTER"){
+			m = new HunterMove();
+		}else{
+			m = new PreyMove();
+		}
+
 		m.fromX = loc.xloc;
 		m.fromY = loc.yloc;
 		switch(cd) {
