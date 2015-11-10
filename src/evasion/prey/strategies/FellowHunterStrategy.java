@@ -59,17 +59,20 @@ public class FellowHunterStrategy extends AbsPreyStrategy {
 		System.out.println("getBestDirection[1] distBefore=" + distBefore);
 		System.out.println("getBestDirection[2] distAfter=" + distAfter);
 		
-		if(distAfter < distBefore){
+		if(distAfter <= distBefore){
 			// if the hunter is approaching, also approaching the hunter 
 			if(!b.wallExistsBetween(hl, pl)){
 				m = getCounterDirection(b, hm, hl, pl);
+				System.out.println("getBestDirection[3-1]  m="+ m.toString());
 			}else{
 				// if has wall, go to the position as far as possible from the hunter
 				m = getLeavingDirection(b, hm, hl, pl);
+				System.out.println("getBestDirection[3-2] m="+ m.toString());
 			}
 		} else {
 			// if hunter is leaving, fellow the hunter
 			m = getFellowDirection(b, hm, hl, pl);
+			System.out.println("getBestDirection[3-3] m=" + m.toString());
 		}
 		return m;
 	}

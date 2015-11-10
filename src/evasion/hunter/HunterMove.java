@@ -54,7 +54,7 @@ public class HunterMove extends Move {
 			for (Wall aw : teardownWalls) {
 				wids.add(aw.wallIndex);
 			}
-			hm.put("wallIndex", wids);
+			hm.put("wallIds", wids);
 			String action = "";
 			try {
 				action = writer.writeValueAsString(hm);
